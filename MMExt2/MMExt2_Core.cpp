@@ -191,56 +191,37 @@ return SearchMap<string>(moduleName, myVessel, varName, m_strings, value);
 }
 
 */
-#define MMEXT2_INSFX
-#define MMEXT2_OUTSFX *
+#define MMEXT2_PUT_GET(__ty, __in, __out) __MMEXT2_PUT_GET(__ty, __in, __out)
+#define __MMEXT2_PUT_GET(__ty, __in, __out) \
+bool MMExt2_Core::Put(const char* moduleName, const char* varName, const __ty __in value, const char* vesselName)\
+{  m_##__ty##s[MakeID(moduleName, vesselName, varName)] = value;  return true;  };\
+bool MMExt2_Core::Get(const char* moduleName, const char* varName, __ty __out value, const char* vesselName)\
+{ return SearchMap<__ty>(moduleName, vesselName, varName, m_##__ty##s, value); }
 
-#define MMEXT2_TYPE int
-#include "MMExt2_CoreTypeImp.hpp"
+MMEXT2_PUT_GET(int, , *);
+MMEXT2_PUT_GET(bool, , *);
+MMEXT2_PUT_GET(double, , *);
+MMEXT2_PUT_GET(string, , *);
+MMEXT2_PUT_GET(VECTOR3, &, *);
+MMEXT2_PUT_GET(MATRIX3, &, *);
+MMEXT2_PUT_GET(MATRIX4, &, *);
 
-#define MMEXT2_TYPE bool
-#include "MMExt2_CoreTypeImp.hpp"
-
-#define MMEXT2_TYPE double
-#include "MMExt2_CoreTypeImp.hpp"
-
-#define MMEXT2_TYPE string
-#include "MMExt2_CoreTypeImp.hpp"
-
-#undef MMEXT2_INSFX
-#undef MMEXT2_OUTSFX
-#define MMEXT2_INSFX &
-#define MMEXT2_OUTSFX *
-
-#define MMEXT2_TYPE VECTOR3
-#include "MMExt2_CoreTypeImp.hpp"
-
-#define MMEXT2_TYPE MATRIX3
-#include "MMExt2_CoreTypeImp.hpp"
-
-#define MMEXT2_TYPE MATRIX4
-#include "MMExt2_CoreTypeImp.hpp"
-
-
-/*
-
-
-#define MMEXT2_INTYPE int
-#define MMEXT2_OUTTYPE int*
-#define MMEXT2_MAP m_matrices3
-#include "MMExt2_CoreTypeImp.hpp"
-
-#define MMEXT2_INTYPE int
-#define MMEXT2_OUTTYPE int*
-#define MMEXT2_MAP m_matrices4
-#include "MMExt2_CoreTypeImp.hpp"
-
-*/
 
 bool MMExt2_Core::Delete(const char* moduleName, const char* varName, const char* vesselName)
 {
-  return SearchMapDelete<int>(moduleName, vesselName, varName, m_ints);
-}
+#define MMEXT2_DEL(__ty) __MMEXT2_DEL(__ty)
+#define __MMEXT2_DEL(__ty) delFound = (SearchMapDelete<__ty>(moduleName, vesselName, varName, m_##__ty##s)? true : delFound)
 
+    bool delFound = false;
+    MMEXT2_DEL(int);
+    MMEXT2_DEL(bool);
+    MMEXT2_DEL(double);
+    MMEXT2_DEL(string);
+    MMEXT2_DEL(VECTOR3);
+    MMEXT2_DEL(MATRIX3);
+    MMEXT2_DEL(MATRIX4);
+    return delFound;
+};
 
 MMExt2_Core gCore;
 
@@ -249,37 +230,38 @@ MMExt2_Core gCore;
 // If you chnage the interface, make a new V2, V3 entry and fix up the compatibility for these original ones. 
 //
 
-DLLCLBK bool ModMsgPutIntV1(const char* moduleName, const char* varName, const int value, const char* vesselName) {
-  return gCore.Put(moduleName, varName, value, vesselName);
-}
-DLLCLBK bool ModMsgPutBoolV1(const char* moduleName, const char* varName, const bool value, const char* vesselName) {
-  return gCore.Put(moduleName, varName, value, vesselName);
-}
-DLLCLBK bool ModMsgPutDblV1(const char* moduleName, const char* varName, const double value, const char* vesselName) {
-  return gCore.Put(moduleName, varName, value, vesselName);
-}
-DLLCLBK bool ModMsgPutVecV1(const char* moduleName, const char* varName, const VECTOR3& value, const char* vesselName) {
-  return gCore.Put(moduleName, varName, value, vesselName);
-}
-DLLCLBK bool ModMsgPutBoolV1(const char* moduleName, const char* varName, const bool value, const char* vesselName) {
-  return gCore.Put(moduleName, varName, value, vesselName);
-}
-DLLCLBK bool ModMsgPutDblV1(const char* moduleName, const char* varName, const double value, const char* vesselName) {
-  return gCore.Put(moduleName, varName, value, vesselName);
+#define MMEXT2_INTERFACE_PUT_GET(__ty, __in, __out) __MMEXT2_INTERFACE_PUT_GET(__ty, __in, __out)
+#define __MMEXT2_INTERFACE_PUT_GET(__ty, __in, __out) \
+DLLCLBK bool ModMsgPut_##__ty##_v1(const char* moduleName, const char* varName, const __ty __in value, const char* vesselName) {\
+return gCore.Put(moduleName, varName, value, vesselName);\
+}\
+DLLCLBK bool ModMsgGet_##__ty##_v1(const char* moduleName, const char* varName, __ty __out value, const char* vesselName) {\
+  return gCore.Get(moduleName, varName, value, vesselName);\
 }
 
-DLLCLBK bool ModMsgGetIntV1(const char* moduleName, const char* varName, int* value, const char* vesselName) {
-  return gCore.Get(moduleName, varName, value, vesselName);
+MMEXT2_INTERFACE_PUT_GET(int, , *);
+MMEXT2_INTERFACE_PUT_GET(bool, , *);
+MMEXT2_INTERFACE_PUT_GET(double, , *);
+MMEXT2_INTERFACE_PUT_GET(VECTOR3, &, *);
+MMEXT2_INTERFACE_PUT_GET(MATRIX3, &, *);
+MMEXT2_INTERFACE_PUT_GET(MATRIX4, &, *);
+
+// Special handling for char* into string
+DLLCLBK bool ModMsgPut_c_str_v1(const char* moduleName, const char* varName, const char* value, const char* vesselName) {
+  string str = value;
+  return gCore.Put(moduleName, varName, str, vesselName);
 }
-DLLCLBK bool ModMsgGetBoolV1(const char* moduleName, const char* varName, bool* value, const char* vesselName) {
-  return gCore.Get(moduleName, varName, value, vesselName);
-}
-DLLCLBK bool ModMsgGetDblV1(const char* moduleName, const char* varName, double* value, const char* vesselName) {
-  return gCore.Get(moduleName, varName, value, vesselName);
+DLLCLBK bool ModMsgGet_c_str_v1(const char* moduleName, const char* varName, char **value, const size_t valueMaxLen, const char* vesselName) {
+  string str;
+  if (!gCore.Get(moduleName, varName, &str, vesselName)) {
+    *value[0] = 0;
+    return false;
+  }
+  errno_t err = strcpy_s(*value, valueMaxLen, str.c_str());
+  return (!err);
 }
 
 
-
-DLLCLBK bool ModMsgDelAnyV1(const char* moduleName, const char* varName, const char* vesselName) {
+DLLCLBK bool ModMsgDel_any_v1(const char* moduleName, const char* varName, const char* vesselName) {
   return gCore.Delete(moduleName, varName, vesselName);
 }

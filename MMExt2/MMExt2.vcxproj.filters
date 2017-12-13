@@ -23,8 +23,5 @@
     <ClInclude Include="MMExt2_Core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MMExt2_CoreTypeImp.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
