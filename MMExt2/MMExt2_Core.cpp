@@ -156,18 +156,25 @@ DLLCLBK bool ModMsgGet_MATRIX4_v1( const char* mod, const char* var, MATRIX4* va
 
 DLLCLBK bool ModMsgDel_any_v1(const char* mod, const char* var, const char* ves) { return gCore.Delete(mod, var, ves); }
 
-#define MAX_STR_LEN 256
 // Special handling for string (do not want to expose the string implementation across compiler versions due to lack of ABI; therefore use char* as the interface)
 DLLCLBK bool ModMsgPut_c_str_v1(const char* mod, const char* var, const char* val, const char* ves) {
   string str = val;
-  if (str.length() > MAX_STR_LEN - 1) return false;
   return gCore.Put(mod, var, str, ves);
 }
-DLLCLBK bool ModMsgGet_c_str_v1(const char* mod, const char* var, char *val[], const char* ves) {
+DLLCLBK bool ModMsgGet_c_str_v1(const char* mod, const char* var, char *val[], const size_t len, const char* ves) {
   string str;
   if (!gCore.Get(mod, var, &str, ves)) {
     return false;
   }
-  strcpy_s(*val, MAX_STR_LEN, str.c_str());
+  if (str.length() > len) return false; 
+  strcpy_s(*val, len, str.c_str());
+  return true;
+}
+DLLCLBK bool ModMsgGet_c_str_len_v1(const char* mod, const char* var, size_t *val, const char* ves) {
+  string str;
+  if (!gCore.Get(mod, var, &str, ves)) {
+    return false;
+  }
+  *val = str.length()+1;
   return true;
 }
