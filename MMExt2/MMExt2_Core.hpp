@@ -50,13 +50,13 @@ namespace ModuleMessagingExt
 		MMExt2_Core();
 		virtual ~MMExt2_Core();
 
-    static bool Put(const char* moduleName, const char* varName, const int value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const bool value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const double value, const char* vesselName);
+    static bool Put(const char* moduleName, const char* varName, const int& value, const char* vesselName);
+    static bool Put(const char* moduleName, const char* varName, const bool& value, const char* vesselName);
+    static bool Put(const char* moduleName, const char* varName, const double& value, const char* vesselName);
     static bool Put(const char* moduleName, const char* varName, const VECTOR3& value, const char* vesselName);
     static bool Put(const char* moduleName, const char* varName, const MATRIX3& value, const char* vesselName);
     static bool Put(const char* moduleName, const char* varName, const MATRIX4& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const std::string value, const char* vesselName);
+    static bool Put(const char* moduleName, const char* varName, const std::string& value, const char* vesselName);
 
 /*		static void Put(const ModuleMessagingExtPut& sender, const char* varName, bool var, const VESSEL* myVessel);
 		static void Put(const ModuleMessagingExtPut& sender, const char* varName, int var, const VESSEL* myVessel);
