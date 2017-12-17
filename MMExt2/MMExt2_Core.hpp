@@ -31,7 +31,7 @@
 
 #define DLLEXPIMP __declspec(dllexport)
 
-namespace ModuleMessagingExt
+namespace MMExt2
 {
 /*
 	Purpose:
@@ -54,7 +54,6 @@ namespace ModuleMessagingExt
     unsigned int _sSize;
   };
 
-//	class ModuleMessagingExtPut;
 	class MMExt2_Core
 	{
 	public:
@@ -70,16 +69,6 @@ namespace ModuleMessagingExt
     static bool Put(const char* moduleName, const char* varName, const std::string& value, const char* vesselName);
     static bool Put(const char* moduleName, const char* varName, const MMStruct* value, const char* vesselName);
 
-/*		static void Put(const ModuleMessagingExtPut& sender, const char* varName, bool var, const VESSEL* myVessel);
-		static void Put(const ModuleMessagingExtPut& sender, const char* varName, int var, const VESSEL* myVessel);
-		static void Put(const ModuleMessagingExtPut& sender, const char* varName, double var, const VESSEL* myVessel);
-		static void Put(const ModuleMessagingExtPut& sender, const char* varName, const VECTOR3& var, const VESSEL* myVessel);
-		static void Put(const ModuleMessagingExtPut& sender, const char* varName, const MATRIX3& var, const VESSEL* myVessel);
-		static void Put(const ModuleMessagingExtPut& sender, const char* varName, const MATRIX4& var, const VESSEL* myVessel);
-		static void Put(const ModuleMessagingExtPut& sender, const char* varName, const ModuleMessagingExtBase* var, const VESSEL* myVessel);
-    static void Put(const ModuleMessagingExtPut& sender, const char* varName, std::string var, const VESSEL* myVessel);
-*/
-//		static bool Get(const char* moduleName, const char* varName, bool* var, const VESSEL* myVessel);
     static bool Get(const char* moduleName, const char* varName, int* value, const char* vesselName);
     static bool Get(const char* moduleName, const char* varName, bool* value, const char* vesselName);
     static bool Get(const char* moduleName, const char* varName, double* value, const char* vesselName);
@@ -89,27 +78,11 @@ namespace ModuleMessagingExt
     static bool Get(const char* moduleName, const char* varName, std::string* value, const char* vesselName);
     static bool Get(const char* moduleName, const char* varName, const MMStruct** value, const char* vesselName);
 
-/*		static bool Get(const char* moduleName, const char* varName, double* var, const VESSEL* myVessel);
-		static bool Get(const char* moduleName, const char* varName, VECTOR3* var, const VESSEL* myVessel);
-		static bool Get(const char* moduleName, const char* varName, MATRIX3* var, const VESSEL* myVessel);
-		static bool Get(const char* moduleName, const char* varName, MATRIX4* var, const VESSEL* myVessel);
-		static bool Get(const char* moduleName, const char* varName, const ModuleMessagingExtBase** var, const VESSEL* myVessel);
-    static bool Get(const char* moduleName, const char* varName, std::string *var, const VESSEL* myVessel);
 
-		static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, bool var, const VESSEL* myVessel);
-		static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, int var, const VESSEL* myVessel);
-		static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, double var, const VESSEL* myVessel);
-		static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, const VECTOR3& var, const VESSEL* myVessel);
-		static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, const MATRIX3& var, const VESSEL* myVessel);
-		static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, const MATRIX4& var, const VESSEL* myVessel);
-		static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, const ModuleMessagingExtBase* var, const VESSEL* myVessel);
-    static bool Delete(const ModuleMessagingExtPut& sender, const char* varName, std::string var, const VESSEL* myVessel);
-*/
     static bool Delete(const char* moduleName, const char* varName, const char* vesselName);
 
 	protected:
 	private:
-//		static std::string MakeID(const ModuleMessagingExtPut& sender, const VESSEL* myVessel, const char* varName);
 		static std::string MakeID(const char* moduleName, const char* vesselName, const char* varName);
 		template<class T> static bool SearchMap(const char* moduleName, const char* vesselName,
 												const char* varName, const std::map<std::string, T>& mapToSearch, T* returnValue);
@@ -125,7 +98,5 @@ namespace ModuleMessagingExt
 		static std::map<std::string, MATRIX4> m_MATRIX4s;
     static std::map<std::string, std::string> m_strings;
     static std::map<std::string, const MMStruct*> m_MMStructs;
-    //    static std::map<std::string, const ModuleMessagingExtBase*> m_basepointers;
 	};
-
 }

@@ -60,6 +60,13 @@
     <Link>
       <OutputFile>$(ModuleDir)\$(ProjectName).dll</OutputFile>
     </Link>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>CopyHPPtoOrbiter.bat</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -75,12 +82,23 @@
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(ModuleDir)\$(ProjectName).dll</OutputFile>
     </Link>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>CopyHPPtoOrbiter.bat</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MMExt2_Core.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MMExt2_Client.hpp" />
     <ClInclude Include="MMExt2_Core.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CopyHPPtoOrbiter.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

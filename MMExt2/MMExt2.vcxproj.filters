@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{2c8c81a1-c9df-4f5a-9631-3de03964217c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MMExt2_Core.cpp">
@@ -23,5 +26,13 @@
     <ClInclude Include="MMExt2_Core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MMExt2_Client.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CopyHPPtoOrbiter.bat">
+      <Filter>Misc</Filter>
+    </None>
   </ItemGroup>
 </Project>
