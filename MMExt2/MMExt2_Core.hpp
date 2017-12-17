@@ -43,6 +43,17 @@ namespace ModuleMessagingExt
 	None. Do not call this directly or try to use this directly.
 */
 
+  struct MMStruct {
+  public:
+    MMStruct(unsigned int sVer, unsigned int sSize) : _sVer(sVer), _sSize(sSize) {};
+    virtual ~MMStruct() {};
+  private:
+    bool IsCorrectVersion(unsigned int sVer) const { return sVer == _sVer; }
+    bool IsCorrectSize(unsigned int sSize) const { return sSize == _sSize; }
+    unsigned int _sVer;
+    unsigned int _sSize;
+  };
+
 //	class ModuleMessagingExtPut;
 	class MMExt2_Core
 	{
@@ -57,6 +68,7 @@ namespace ModuleMessagingExt
     static bool Put(const char* moduleName, const char* varName, const MATRIX3& value, const char* vesselName);
     static bool Put(const char* moduleName, const char* varName, const MATRIX4& value, const char* vesselName);
     static bool Put(const char* moduleName, const char* varName, const std::string& value, const char* vesselName);
+    static bool Put(const char* moduleName, const char* varName, const MMStruct* value, const char* vesselName);
 
 /*		static void Put(const ModuleMessagingExtPut& sender, const char* varName, bool var, const VESSEL* myVessel);
 		static void Put(const ModuleMessagingExtPut& sender, const char* varName, int var, const VESSEL* myVessel);
@@ -75,6 +87,7 @@ namespace ModuleMessagingExt
     static bool Get(const char* moduleName, const char* varName, MATRIX3* value, const char* vesselName);
     static bool Get(const char* moduleName, const char* varName, MATRIX4* value, const char* vesselName);
     static bool Get(const char* moduleName, const char* varName, std::string* value, const char* vesselName);
+    static bool Get(const char* moduleName, const char* varName, const MMStruct** value, const char* vesselName);
 
 /*		static bool Get(const char* moduleName, const char* varName, double* var, const VESSEL* myVessel);
 		static bool Get(const char* moduleName, const char* varName, VECTOR3* var, const VESSEL* myVessel);
@@ -111,7 +124,8 @@ namespace ModuleMessagingExt
 		static std::map<std::string, MATRIX3> m_MATRIX3s;
 		static std::map<std::string, MATRIX4> m_MATRIX4s;
     static std::map<std::string, std::string> m_strings;
-//    static std::map<std::string, const ModuleMessagingExtBase*> m_basepointers;
+    static std::map<std::string, const MMStruct*> m_MMStructs;
+    //    static std::map<std::string, const ModuleMessagingExtBase*> m_basepointers;
 	};
 
 }

@@ -41,7 +41,7 @@ map<string, VECTOR3> MMExt2_Core::m_VECTOR3s;
 map<string, MATRIX3> MMExt2_Core::m_MATRIX3s;
 map<string, MATRIX4> MMExt2_Core::m_MATRIX4s;
 map<string, string> MMExt2_Core::m_strings;
-//map<string, const ModuleMessagingExtBase*> MMExt2_Core::m_basepointers;
+map<string, const MMStruct*> MMExt2_Core::m_MMStructs;
 const char MMExt2_Core::m_token = '`';
 
 MMExt2_Core::MMExt2_Core()
@@ -111,6 +111,8 @@ bool MMExt2_Core::Put(const char* mod, const char* var, const string &val,  cons
 bool MMExt2_Core::Put(const char* mod, const char* var, const VECTOR3& val, const char* ves) { m_VECTOR3s[MakeID(mod, ves, var)] = val;  return true; }
 bool MMExt2_Core::Put(const char* mod, const char* var, const MATRIX3& val, const char* ves) { m_MATRIX3s[MakeID(mod, ves, var)] = val;  return true; }
 bool MMExt2_Core::Put(const char* mod, const char* var, const MATRIX4& val, const char* ves) { m_MATRIX4s[MakeID(mod, ves, var)] = val;  return true; }
+bool MMExt2_Core::Put(const char* mod, const char* var, const MMStruct* val, const char* ves) { m_MMStructs[MakeID(mod, ves, var)] = val;  return true; }
+
 
 bool MMExt2_Core::Get(const char* mod, const char* var, int* val,     const char* ves) { return SearchMap<int>(    mod, ves, var, m_ints,     val); }
 bool MMExt2_Core::Get(const char* mod, const char* var, bool* val,    const char* ves) { return SearchMap<bool>(   mod, ves, var, m_bools,    val); }
@@ -119,6 +121,7 @@ bool MMExt2_Core::Get(const char* mod, const char* var, string* val,  const char
 bool MMExt2_Core::Get(const char* mod, const char* var, VECTOR3* val, const char* ves) { return SearchMap<VECTOR3>(mod, ves, var, m_VECTOR3s, val); }
 bool MMExt2_Core::Get(const char* mod, const char* var, MATRIX3* val, const char* ves) { return SearchMap<MATRIX3>(mod, ves, var, m_MATRIX3s, val); }
 bool MMExt2_Core::Get(const char* mod, const char* var, MATRIX4* val, const char* ves) { return SearchMap<MATRIX4>(mod, ves, var, m_MATRIX4s, val); }
+bool MMExt2_Core::Get(const char* mod, const char* var, const MMStruct** val, const char* ves) { return SearchMap<const MMStruct *>(mod, ves, var, m_MMStructs, val); }
 
 bool MMExt2_Core::Delete(const char* mod, const char* var, const char* ves)
 {
@@ -130,6 +133,7 @@ bool MMExt2_Core::Delete(const char* mod, const char* var, const char* ves)
     delFound = (SearchMapDelete<VECTOR3>(mod, ves, var, m_VECTOR3s) ? true : delFound);
     delFound = (SearchMapDelete<MATRIX3>(mod, ves, var, m_MATRIX3s) ? true : delFound);
     delFound = (SearchMapDelete<MATRIX4>(mod, ves, var, m_MATRIX4s) ? true : delFound);
+    delFound = (SearchMapDelete<const MMStruct*>(mod, ves, var, m_MMStructs) ? true : delFound);
     return delFound;
 }
 
@@ -140,19 +144,21 @@ MMExt2_Core gCore;
 // If you change this interface, make a new V2, V3 set of entry points and fix up the compatibility for all apps using these original ones. 
 //
 
-DLLCLBK bool ModMsgPut_int_v1(     const char* mod, const char* var, const int& val,     const char* ves) { return gCore.Put(mod, var, val, ves); }
-DLLCLBK bool ModMsgPut_bool_v1(    const char* mod, const char* var, const bool& val,    const char* ves) { return gCore.Put(mod, var, val, ves); }
-DLLCLBK bool ModMsgPut_double_v1(  const char* mod, const char* var, const double& val,  const char* ves) { return gCore.Put(mod, var, val, ves); }
-DLLCLBK bool ModMsgPut_VECTOR3_v1( const char* mod, const char* var, const VECTOR3& val, const char* ves) { return gCore.Put(mod, var, val, ves); }
-DLLCLBK bool ModMsgPut_MATRIX3_v1( const char* mod, const char* var, const MATRIX3& val, const char* ves) { return gCore.Put(mod, var, val, ves); }
-DLLCLBK bool ModMsgPut_MATRIX4_v1( const char* mod, const char* var, const MATRIX4& val, const char* ves) { return gCore.Put(mod, var, val, ves); }
+DLLCLBK bool ModMsgPut_int_v1(     const char* mod, const char* var, const int& val,       const char* ves) { return gCore.Put(mod, var, val, ves); }
+DLLCLBK bool ModMsgPut_bool_v1(    const char* mod, const char* var, const bool& val,      const char* ves) { return gCore.Put(mod, var, val, ves); }
+DLLCLBK bool ModMsgPut_double_v1(  const char* mod, const char* var, const double& val,    const char* ves) { return gCore.Put(mod, var, val, ves); }
+DLLCLBK bool ModMsgPut_VECTOR3_v1( const char* mod, const char* var, const VECTOR3& val,   const char* ves) { return gCore.Put(mod, var, val, ves); }
+DLLCLBK bool ModMsgPut_MATRIX3_v1( const char* mod, const char* var, const MATRIX3& val,   const char* ves) { return gCore.Put(mod, var, val, ves); }
+DLLCLBK bool ModMsgPut_MATRIX4_v1( const char* mod, const char* var, const MATRIX4& val,   const char* ves) { return gCore.Put(mod, var, val, ves); }
+DLLCLBK bool ModMsgPut_MMStruct_v1(const char* mod, const char* var, const MMStruct* val,  const char* ves) { return gCore.Put(mod, var, val, ves); }
 
-DLLCLBK bool ModMsgGet_int_v1(     const char* mod, const char* var, int* val,     const char* ves) { return gCore.Get(mod, var, val, ves); }
-DLLCLBK bool ModMsgGet_bool_v1(    const char* mod, const char* var, bool* val,    const char* ves) { return gCore.Get(mod, var, val, ves); }
-DLLCLBK bool ModMsgGet_double_v1(  const char* mod, const char* var, double* val,  const char* ves) { return gCore.Get(mod, var, val, ves); }
-DLLCLBK bool ModMsgGet_VECTOR3_v1( const char* mod, const char* var, VECTOR3* val, const char* ves) { return gCore.Get(mod, var, val, ves); }
-DLLCLBK bool ModMsgGet_MATRIX3_v1( const char* mod, const char* var, MATRIX3* val, const char* ves) { return gCore.Get(mod, var, val, ves); }
-DLLCLBK bool ModMsgGet_MATRIX4_v1( const char* mod, const char* var, MATRIX4* val, const char* ves) { return gCore.Get(mod, var, val, ves); }
+DLLCLBK bool ModMsgGet_int_v1(     const char* mod, const char* var, int* val,             const char* ves) { return gCore.Get(mod, var, val, ves); }
+DLLCLBK bool ModMsgGet_bool_v1(    const char* mod, const char* var, bool* val,            const char* ves) { return gCore.Get(mod, var, val, ves); }
+DLLCLBK bool ModMsgGet_double_v1(  const char* mod, const char* var, double* val,          const char* ves) { return gCore.Get(mod, var, val, ves); }
+DLLCLBK bool ModMsgGet_VECTOR3_v1( const char* mod, const char* var, VECTOR3* val,         const char* ves) { return gCore.Get(mod, var, val, ves); }
+DLLCLBK bool ModMsgGet_MATRIX3_v1( const char* mod, const char* var, MATRIX3* val,         const char* ves) { return gCore.Get(mod, var, val, ves); }
+DLLCLBK bool ModMsgGet_MATRIX4_v1( const char* mod, const char* var, MATRIX4* val,         const char* ves) { return gCore.Get(mod, var, val, ves); }
+DLLCLBK bool ModMsgGet_MMStruct_v1(const char* mod, const char* var, const MMStruct** val, const char* ves) { return gCore.Get(mod, var, val, ves); }
 
 DLLCLBK bool ModMsgDel_any_v1(const char* mod, const char* var, const char* ves) { return gCore.Delete(mod, var, ves); }
 
