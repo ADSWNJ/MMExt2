@@ -36,67 +36,137 @@ namespace MMExt2
   /*
   Purpose:
 
-  Gets data from other MFD's using the common MMExt2 library. Data can be passed by val
-  or by reference. For pass by reference, the MMExt2 library implements several further
-  checks to ensure safety and to deal with potential version or definition mismatches.
+  Bi-directional data interchange between Orbiter modules (e.g. MFDs, Vessels). 
 
   Developer Instructions:
 
-  1. #include "EnjoLib/MMExt2.hpp" where you need to get data from MMExt2.
+  1. Install the ModuleMessagingExt addon from OrbitHangar, to get this file in your Orbitersdk\Include folder. 
 
-  2. For get by val ... call EnjoLib::MMExt2().Get(MFDname, var, &val, {vessel}),
-  where:	MFDname is a string literal for the sending MFD or module (e.g. "BaseSyncMFD"),
-  var is a string literal for the variable you are looking for
-  &val is the address of where you want the val to be received, and is one of the following
-  types: bool, int, double, VECTOR3, MATRIX3, and MATRIX4.
-  vessel is VESSEL* pointer to the vessel you want to get data from (defaults to your vessel).
+  2. #include "MMExt2_Client.hpp" where you need to get data from MMExt2 (e.g. in your class header file). 
 
-  The return is a bool indicating success or failure. If successful, the val will have the new data.
+  3. Choose if you want to use the Basic or Advanced interface: 
 
-  3. For get by reference (meaning you are addressing memory directly in the other DLL), the author
-  of the module PUTting the data will give you a header file with a data structure like this:
+     Basic: Put, Get, Delete on the following types: int, bool, double, VECTOR3, MATRIX3, MATRIX4, std::string
 
-  #pragma pack(push)
-  #pragma pack(8)
-  struct XYZ : public EnjoLib::MMExt2Base {
-  XYZ():EnjoLib::MMExt2Base(13,sizeof(XYZ)) {};  // version 13
-  ...
-  ... your data structures (don't use STL's like std::string
-  ... or std::map, etc as these tend not to be byte-compatible
-  ... across compiler versions)
-  ...
-  };
-  #pragma pack(pop)
+     Advanced: all of basic, plus the option to Put and Delete for other vessels, plus put, get, delete of
+     MMStruct-derived structures. 
 
-  (Obviously with their structure name instead of XYZ). Include this header into your code to give you
-  the latest definition of the structure and version you are accessing. Make a note of the version number
-  on the MMExt2Base constructor (i.e. 13 in this case), as you need it for your ModMsgGetByRef()
-  call.
+  For Basic Interface:
 
-  In your code, define a pointer to a constant XYZ structure (replace XYZ, of course), such as:
+  4. In your class definition, declare the Module Messaging interface with:    MMExt2::Basic mm; 
 
-  constant struct xyz *remoteData;
+  5. In your class constructor, initialize the interface with:   mm.Init(MY_MODULE_NAME);
+     (where MY_MODULE_NAME is a char string for your module name ... e.g. mm.Init("GS2") )
 
-  This tells the compiler that you guarantee not to write data via the pointer. (If you wanted to do this,
-  and the other module author wanted to cooperate, then have both sides ModMsgGetByRef the other side
-  and write local / read remote.)
+  6. Where you want to PUT a value to Module Messaging:
 
-  Then, call EnjoLib::MMExt2().ModMsgGetByRef(MFDname, structName, structVer, &structPtr,
-  {vessel}), where the structName and structVer are given to you by the author of the PUTting module,
-  and the other parameters are the same as the ModMsgGet(). In addition to looking up the data and returning
-  it if found, the library will do additional checks to ensure the structure has a valid
-  inheritance from the ModuleMessagigngBaseStruct, the structure version number is identical, and
-  the structure size is also correct. (The PUT side should increment the version any time the structure
-  is changed, which will prevent you accessing a wrong verion of the structure, and the sizeof()
-  check is there as a further failsafe). So if you get a "true" back from ModMsgGetByRef(), you can be
-  reasonably sure that everything is safe and you will not crash the Orbiter when you reference the data.
+        RET = mm.Put(VARNAME, VALUE); 
+        ... where VARNAME is a char * constant for the variable name (e.g. "BurnTime")
+                  VALUE is a literal value or a pass-by-reference to one of the 7 base types,
+                  RET = true if MM is installed and the put was successful (ignore if you don't care!)
 
-  4. To link your code, make sure your Linker, Input, AdditionalDependencies includes MMExt2.lib.
-  Have a look at http://orbiter-forum.com/showthread.php?t=34971 for advice on setting up Property Pages
-  for Orbiter development (highly recommended, and it makes things much easier). If you do this, then
-  you can edit the Linker Input Additional Directories in the orbiter_vs2005 proprty page and this will
-  let you resolve any ModuleMessagigngExt for this and future projects.
+  7. Where you want to DELETE a value from Module Messaging (e.g. if not longer valid):
+
+        RET = mm.Delete(VARNAME);
+        ... where RET = true if MM is installed and the delete was successful (ignore if you don't care!)
+        ... note: the function deletes all variables with VARNAME, regardless of type. 
+
+  8. Where you want to GET a value from Module Messaging (i.e. get from another module:
+
+        RET = mm.Get(MODULE, VARNAME, &VALUE);
+        ... where MODULE is a char * constant for the module you are getting from
+                  &VALUE is the address for the return data type
+                  RET = true if MM is installed and the get was successful (ignore if you don't care!)
+        
+
+  For the Advanced Interface:
+
+  9. Declare your interface with:   MMExt2::Advanced mm;   (instead of MMExt2::Basic mm;)
+  
+  10. Init is the same as the basic init:   mm.Init(MY_MODULE_NAME);
+
+  11. The Put, Delete, Get all take an optional extra parameter for the vessel you are interacting with
+  (e.g. if you want to maintain different Module Messaging values for multiple vessels in the simulation). 
+
+  12. You are additionally able to put and get a structure. **WARNING** this allows clients read-only
+      access directly to your data structure without needing to do repreated GET functions. Although this sounds
+      great, you need to be careful to implement it properly, or you will cause crashes to desktop. Still interested?
+      Read on.
+
+  For Advanced Interface Put for Structures:
+
+  13. You *must* derive from MMExt2::MMStruct. Create a .hpp definition file for your struct and put into your
+      .zip package so it unzips into Orbitersdk\include ... e.g. <MY_MODULE>_Exports.hpp. 
+      
+      Define your structure as follows:
+
+      #pragma once
+      #pragma pack(push)
+      #pragma pack(8)
+      #define MY_STRUCT_VERSION 1
+      struct MY_STRUCT_NAME : public MMExt2::MMStruct {
+          MyStruct() : MMExt2::MMStruct(MY_STRUCT_VERSION, sizeof(MyStruct)) {};
+           ... add your elements here ... 
+           ... but keep things with simple data types only and no code, so it works across compilers ...
+           ... especially do not include standard template library elements like std::string, std::vector ...
+      };
+      #pragma pack(pop)
+
+      ... where MY_STRUCT_NAME is whatever you want, and 
+                MY_STRUCT_VERSION is a version number for your structure (increment it when you change
+                    the structure, to ensure that clients not linked to your latest version intentionally
+                    break cleanly - i.e. RET = false - until they re-compile with your updated data). 
+
+      The #pragma pack lines ensure a consistent packing for the structure, across Visual C++ compilers.
+      The structure derivation from MMExt2::MMStruct allows Module Messaging to do extra safety checks
+      to ensure the Put and Get modules are both using the same version of the struct, and the same size. 
+
+  14. Instantiate your structure in a persistent place in your code (i.e. do not allow it to be destroyed for the
+      whole execution of the simulation, as other modules will be referencing your data directly) 
+  
+  15. To make your structure accessible, do:
+
+          RET = mm.PutMMStruct(VARNAME, &STRUCT); 
+          where ... &STRUCT is the address of your MMStruct-derived structure (e.g. &mms)
+                    RET is true if MM is present, and the structure PUT was successful. 
+
+  16. Note ... there is no Delete function for MMStruct structs, intentionally, as once you have exposed the
+      struct, you must assume that one or more other modules have attached to your struct and are relying on it. 
+      If you need to flag the struct as invalid, consider putting a boolen in the structure defintion (e.g
+      bool IsValid;)
+
+  For Advanced Interface Get for Structures:
+
+  17. Include the header file for the structure definition - e.g. #include "<OTHER_MODULE>_Exports.hpp" from the
+      provider of the structure. 
+
+  18. Declare a constant pointer to the structure - e.g. 
+
+      const OTHER_MODULE_STRUCT_NAME *p_OTHER_MODULE_struct;
+      ... where MY_STRUCT_NAME is the name gicen by the other module's export file. 
+
+      Note ... this *must* be a const pointer, as you are not allowed to change the other module's private
+      data structure. If you need 2-way interchange, then Put your own module back and agree a message passing
+      protocol with the other developer. 
+
+  19. To get the remote structure, do:
+
+          RET = mm.GetMMStruct(MODULENAME, VARNAME, &p_OTHER_MODULE_struct, MY_STRUCT_VERSION, sizeof(OTHER_MODULE_STRUCT_NAME);
+          ... where MODULENAME is the other module's name
+                    VARNAME is the structure name variable
+                    &p_OTHER_MODULE_struct is the address of your struct pointer
+                    MY_STRUCT_VERSION ... is the version number defined in the export file (note: when the structure 
+                      changes version, you will need to re-compile and re-release your module to attach to the new structure)
+                    sizeof(OTHER_MODULE_STRUCT_NAME) ... is a final safety check to make sure your compiler's view of the size
+                      of the structure matches the Put module compiler's view of the same structure. 
+                    and RET is true if it all works as expected!
+
+   That's it. No additional linkage is needed for youtr module, and there is guaranteed no "Error 126" DLL not found from this
+   code. All that happens if your user does not install ModuleMessagingExt is that you will get consistent FALSE responses on all
+   Put, Get, and Delete calls. 
   */
+
+
   struct MMStruct {
   public:
     MMStruct(unsigned int sVer, unsigned int sSize) : _sVer(sVer), _sSize(sSize) {};
@@ -249,14 +319,13 @@ namespace MMExt2
 
   class Advanced {
   public:
-    void Init   (const char *moduleName)                                                               { m_mod = moduleName; m_imp.__Init(); }
-    bool Put    (const char* var, const char val[], const VESSEL* ves = oapiGetFocusInterface()) const { return m_imp.__Put(m_mod, var, std::string(val), ves); }
+    void Init   (const char *moduleName)                                                                      { m_mod = moduleName; m_imp.__Init(); }
+    bool Put    (const char* var, const char val[], const VESSEL* ves = oapiGetFocusInterface())        const { return m_imp.__Put(m_mod, var, std::string(val), ves); }
     template<typename T>
-    bool Put    (const char* var, const T& val, const VESSEL* ves = oapiGetFocusInterface())     const { return m_imp.__Put(m_mod, var, val, ves); }
+    bool Put    (const char* var, const T& val, const VESSEL* ves = oapiGetFocusInterface())            const { return m_imp.__Put(m_mod, var, val, ves); }
     template<typename T>
-    bool Get    (const char* var, T* val, const VESSEL* ves = oapiGetFocusInterface())           const { return m_imp.__Get(m_mod, var, val, ves); }
-    bool Delete (const char* var, const VESSEL* ves = oapiGetFocusInterface())                   const { return m_imp.__Del(m_mod, var, ves); }
-    void SetMod (const char *moduleName)                                                               { m_imp.__Init(); m_mod = moduleName; }
+    bool Get    (const char* mod, const char* var, T* val, const VESSEL* ves = oapiGetFocusInterface()) const { return m_imp.__Get(std::string(mod), var, val, ves); }
+    bool Delete (const char* var, const VESSEL* ves = oapiGetFocusInterface())                          const { return m_imp.__Del(m_mod, var, ves); }
 
     template<typename T>
     bool PutMMStruct(const char* var, const T val, const VESSEL* ves = oapiGetFocusInterface()) const {
@@ -265,9 +334,9 @@ namespace MMExt2
     }
 
     template<typename T>
-    bool GetMMStruct(const char* var, T* val, const unsigned int ver, const unsigned int siz, const VESSEL* ves = oapiGetFocusInterface()) const {
+    bool GetMMStruct(const char* mod, const char* var, T* val, const unsigned int ver, const unsigned int siz, const VESSEL* ves = oapiGetFocusInterface()) const {
       const MMStruct *pMMStruct;
-      if (!m_imp.__Get(m_mod, var, &pMMStruct, ves)) return false;
+      if (!m_imp.__Get(std::string(mod), var, &pMMStruct, ves)) return false;
       if (!pMMStruct->IsCorrectSize(siz) || !pMMStruct->IsCorrectVersion(ver)) return false;
       *val = dynamic_cast<T>(pMMStruct);
       return (val != NULL);
@@ -282,13 +351,13 @@ namespace MMExt2
   class Basic
   {
   public:
-    void Init   (const char *moduleName)                  { m_mod = moduleName; m_ves = oapiGetFocusInterface(); m_imp.__Init();    }
-    bool Put    (const char* var, const char val[]) const { return m_imp.__Put(m_mod, var, std::string(val), m_ves); }
+    void Init   (const char *moduleName)                        { m_mod = moduleName; m_ves = oapiGetFocusInterface(); m_imp.__Init();    }
+    bool Put    (const char* var, const char val[])        const { return m_imp.__Put(m_mod, var, std::string(val), m_ves); }
     template<typename T>
-    bool Put    (const char* var, const T& val)     const { return m_imp.__Put(m_mod, var, val, m_ves); }
+    bool Put    (const char* var, const T& val)            const { return m_imp.__Put(m_mod, var, val, m_ves); }
     template<typename T>
-    bool Get    (const char* var, T* val)           const { return m_imp.__Get(m_mod, var, val, m_ves); }
-    bool Delete (const char* var)                   const { return m_imp.__Del(m_mod, var, m_ves); }
+    bool Get    (const char* mod, const char* var, T* val) const { return m_imp.__Get(std::string(mod), var, val, m_ves); }
+    bool Delete (const char* var)                          const { return m_imp.__Del(m_mod, var, m_ves); }
   private:
     Implementation m_imp;
     const VESSEL *m_ves;

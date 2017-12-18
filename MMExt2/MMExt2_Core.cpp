@@ -133,7 +133,6 @@ bool MMExt2_Core::Delete(const char* mod, const char* var, const char* ves)
     delFound = (SearchMapDelete<VECTOR3>(mod, ves, var, m_VECTOR3s) ? true : delFound);
     delFound = (SearchMapDelete<MATRIX3>(mod, ves, var, m_MATRIX3s) ? true : delFound);
     delFound = (SearchMapDelete<MATRIX4>(mod, ves, var, m_MATRIX4s) ? true : delFound);
-    delFound = (SearchMapDelete<const MMStruct*>(mod, ves, var, m_MMStructs) ? true : delFound);
     return delFound;
 }
 
