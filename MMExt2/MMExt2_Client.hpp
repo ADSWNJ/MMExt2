@@ -342,7 +342,7 @@ namespace MMExt2
       return (val != NULL);
     }
 
-
+    
   private:
     Implementation m_imp;
     std::string m_mod;
