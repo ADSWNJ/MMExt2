@@ -22,7 +22,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with MMExt2. If not, see
-// <http://www.gnu.org/licenses/>.
+// <http://www.gnu.org/licenses/>
 // ====================================================================
 
 #ifndef MMExt2_Client_H
