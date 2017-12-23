@@ -31,6 +31,8 @@
 
 #define DLLEXPIMP __declspec(dllexport)
 
+using namespace std;
+
 namespace MMExt2
 {
 /*
@@ -60,43 +62,44 @@ namespace MMExt2
 		MMExt2_Core();
 		virtual ~MMExt2_Core();
 
-    static bool Put(const char* moduleName, const char* varName, const int& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const bool& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const double& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const VECTOR3& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const MATRIX3& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const MATRIX4& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const std::string& value, const char* vesselName);
-    static bool Put(const char* moduleName, const char* varName, const MMStruct* value, const char* vesselName);
+    static bool Put(const string& id, const bool& val);
+    static bool Put(const string& id, const int& val);
+    static bool Put(const string& id, const double& val);
+    static bool Put(const string& id, const string& val);
+    static bool Put(const string& id, const VECTOR3& val);
+    static bool Put(const string& id, const MATRIX3& val);
+    static bool Put(const string& id, const MATRIX4& val);
+    static bool Put(const string& id, const MMStruct* val);
 
-    static bool Get(const char* moduleName, const char* varName, int* value, const char* vesselName);
-    static bool Get(const char* moduleName, const char* varName, bool* value, const char* vesselName);
-    static bool Get(const char* moduleName, const char* varName, double* value, const char* vesselName);
-    static bool Get(const char* moduleName, const char* varName, VECTOR3* value, const char* vesselName);
-    static bool Get(const char* moduleName, const char* varName, MATRIX3* value, const char* vesselName);
-    static bool Get(const char* moduleName, const char* varName, MATRIX4* value, const char* vesselName);
-    static bool Get(const char* moduleName, const char* varName, std::string* value, const char* vesselName);
-    static bool Get(const char* moduleName, const char* varName, const MMStruct** value, const char* vesselName);
+    static bool Get(const string& get, const string& id, int* val);
+    static bool Get(const string& get, const string& id, bool* val);
+    static bool Get(const string& get, const string& id, double* val);
+    static bool Get(const string& get, const string& id, string* val);
+    static bool Get(const string& get, const string& id, VECTOR3* val);
+    static bool Get(const string& get, const string& id, MATRIX3* val);
+    static bool Get(const string& get, const string& id, MATRIX4* val);
+    static bool Get(const string& get, const string& id, const MMStruct** val);
 
-
-    static bool Delete(const char* moduleName, const char* varName, const char* vesselName);
+    static bool MMExt2_Core::Delete(const string& s);
 
 	protected:
 	private:
-		static std::string MakeID(const char* moduleName, const char* vesselName, const char* varName);
-		template<class T> static bool SearchMap(const char* moduleName, const char* vesselName,
-												const char* varName, const std::map<std::string, T>& mapToSearch, T* returnValue);
-    template<class T> static bool SearchMapDelete(  const char* moduleName, const char* vesselName,
-                                                        const char* varName, std::map<std::string, T>& mapToSearch);
+    static bool DeleteType(const string &id, const char type);
+
+		template<class T> static bool SearchMap(const string& get, const string& id, const map<string, T>& mapToSearch, T* returnValue);
+    template<class T> static bool SearchMapDelete(const string &id, map<string, T>& mapToSearch);
+    static bool Find(const string gmod, int* index, const string mod, const string var,  const string ves, const bool& skipMe,
+                     char* findType, string *findMod, string *findVar);
 
 		static const char m_token;
-		static std::map<std::string, bool> m_bools;
-		static std::map<std::string, int> m_ints;
-		static std::map<std::string, double> m_doubles;
-		static std::map<std::string, VECTOR3> m_VECTOR3s;
-		static std::map<std::string, MATRIX3> m_MATRIX3s;
-		static std::map<std::string, MATRIX4> m_MATRIX4s;
-    static std::map<std::string, std::string> m_strings;
-    static std::map<std::string, const MMStruct*> m_MMStructs;
+		static map<string, bool> m_bools;
+		static map<string, int> m_ints;
+		static map<string, double> m_doubles;
+		static map<string, VECTOR3> m_VECTOR3s;
+		static map<string, MATRIX3> m_MATRIX3s;
+		static map<string, MATRIX4> m_MATRIX4s;
+    static map<string, string> m_strings;
+    static map<string, const MMStruct*> m_MMStructs;
+    static map<string, char> MMExt2_Core::m_types;
 	};
 }
