@@ -1,3 +1,3 @@
 @echo Copying MMExt2_Client.hpp to %OrbiterDir%\orbitersdk\include...
-copy MMExt2_Client.hpp %OrbiterDir%\orbitersdk\include
+rem copy MMExt2_Client.hpp %OrbiterDir%\orbitersdk\include
 

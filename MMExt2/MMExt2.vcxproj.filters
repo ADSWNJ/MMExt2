@@ -26,7 +26,7 @@
     <ClInclude Include="MMExt2_Core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MMExt2_Client.hpp">
+    <ClInclude Include="MMExt2\__MMExt2_MMStruct.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -34,5 +34,10 @@
     <None Include="CopyHPPtoOrbiter.bat">
       <Filter>Misc</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="lgpl.txt">
+      <Filter>Misc</Filter>
+    </Text>
   </ItemGroup>
 </Project>
