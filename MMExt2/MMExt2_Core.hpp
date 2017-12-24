@@ -81,6 +81,7 @@ namespace MMExt2
     static bool Get(const string& get, const string& id, const MMStruct** val);
 
     static bool MMExt2_Core::Delete(const string& s);
+    static bool Find(const string& fGet, const string& fMod, const string& fVar, const string& fVes, int* fIx, bool skp, string* rMod, string* rVar, string* rVes, char* rTyp);
 
 	protected:
 	private:
@@ -88,8 +89,6 @@ namespace MMExt2
 
 		template<class T> static bool SearchMap(const string& get, const string& id, const map<string, T>& mapToSearch, T* returnValue);
     template<class T> static bool SearchMapDelete(const string &id, map<string, T>& mapToSearch);
-    static bool Find(const string gmod, int* index, const string mod, const string var,  const string ves, const bool& skipMe,
-                     char* findType, string *findMod, string *findVar);
 
 		static const char m_token;
 		static map<string, bool> m_bools;

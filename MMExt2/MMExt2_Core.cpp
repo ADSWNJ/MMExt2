@@ -33,6 +33,9 @@
 using namespace MMExt2;
 using namespace std;
 
+#define TOKEN_VALUE 186
+
+MMExt2_Core gCore;
 map<string, bool> MMExt2_Core::m_bools;
 map<string, int> MMExt2_Core::m_ints;
 map<string, double> MMExt2_Core::m_doubles;
@@ -42,7 +45,7 @@ map<string, MATRIX4> MMExt2_Core::m_MATRIX4s;
 map<string, string> MMExt2_Core::m_strings;
 map<string, const MMStruct*> MMExt2_Core::m_MMStructs;
 map<string, char> MMExt2_Core::m_types;
-const char MMExt2_Core::m_token = '§';
+const char MMExt2_Core::m_token = char(TOKEN_VALUE);
 
 MMExt2_Core::MMExt2_Core()
 {}
@@ -53,6 +56,7 @@ MMExt2_Core::~MMExt2_Core()
 template<class T>
 static bool MMExt2_Core::SearchMap(const string& get, const string& id, const map<string, T>& mapToSearch, T* returnValue)
 {
+  if (id.length() == 0) return false;
   map<string, T>::const_iterator it = mapToSearch.find(id);
   if (it != mapToSearch.end()) {
     *returnValue = it->second;
@@ -65,13 +69,13 @@ static bool MMExt2_Core::SearchMap(const string& get, const string& id, const ma
 template<class T>
 static bool MMExt2_Core::SearchMapDelete(const string &id, map<string, T>& mapToSearch)
 {
-  map<string, T>::iterator it = mapToSearch.find(id);
-  if (it == mapToSearch.end()) return false;
-  mapToSearch.erase(it);
-  return true;
+  //map<string, T>::iterator it = mapToSearch.find(id);
+  //if (it == mapToSearch.end()) return false;
+  return (mapToSearch.erase(id)>0);
+  //return true;
 }
 
-bool MMExt2_Core::Find(const string gMod, int* index, const string mod, const string var, const string ves, const bool& skipMe, char* findType, string *findMod, string *findVar) {
+bool MMExt2_Core::Find(const string& fGet, const string& fMod, const string& fVar, const string& fVes, int* fIx, bool skp, string* rMod, string* rVar, string* rVes, char* rTyp) {
   int foundIx = 0;
   string itVes, itMod, itVar;
   for (const auto& it : m_types) {
@@ -79,12 +83,12 @@ bool MMExt2_Core::Find(const string gMod, int* index, const string mod, const st
     getline(is, itVes, m_token);
     getline(is, itMod, m_token);
     getline(is, itVar, m_token);
-    if (((mod == "") || (mod == itMod)) && ((var == "") || (var == itVar)) && ((ves == "") || (ves == itVes))  && ((!skipMe) || (itMod != gMod))) {
-      if (foundIx >= *index) {
-        (*index)++;
-        *findType = it.second;
-        if (findMod) {*findMod = itMod;}
-        if (findVar) { *findVar = itVar; }
+    if (((fMod == "*") || (fMod == itMod)) && ((fVar == "*") || (fVar == itVar)) && ((fVes == "") || (fVes == itVes))  && ((!skp) || (fGet != itMod))) {
+      if (foundIx >= *fIx) {
+        *rTyp = it.second;
+        *rMod = itMod;
+        *rVar = itVar;
+        *rVes = itVes;
         return true;
       } else {
         foundIx++;
@@ -113,9 +117,10 @@ bool MMExt2_Core::Get(const string& get, const string& id, MATRIX4* val)        
 bool MMExt2_Core::Get(const string& get, const string& id, const MMStruct** val) {return SearchMap<const MMStruct *>(get, id, m_MMStructs, val);}
 
 bool MMExt2_Core::Delete(const string& id) {
+  if (id.length() == 0) return false;
   if (m_types.count(id)) {
     if (m_types[id] == 'X') return false;
-    DeleteType(id, m_types[id]);
+    if (!DeleteType(id, m_types[id])) return false;
     m_types.erase(id);
   }
   return true;
@@ -148,15 +153,21 @@ bool MMExt2_Core::DeleteType(const string &id, const char type) {
     return delFound;
 }
 
-MMExt2_Core gCore;
+
+
+
 
 // 
 // STATIC ENTRY POINTS
 // If you change this interface, make a new V2, V3 set of entry points and fix up the compatibility for all apps using these original ones. 
 //
 
-std::string _ID(const char* mod, const char* var, const char* ves) {
-  string id = string(ves) + '§' + mod + '§' + var;
+inline std::string _ID(const char* mod, const char* var, const char* ves) {
+  const char token = char(TOKEN_VALUE);
+  string id = "", s_ves = ves, s_mod = mod, s_var = var;
+  if (s_ves.length() == 0 || s_mod.length() == 0 || s_var.length() == 0) return id;
+  if (s_ves.find(token) != -1 || s_mod.find(token) != -1 || s_var.find(token) != -1) return id;
+  id = s_ves + token + s_mod + token + s_var;
   return id;
 }
 
@@ -186,14 +197,23 @@ DLLCLBK bool ModMsgPut_c_str_v1(const char* mod, const char* var, const char* va
 }
 DLLCLBK bool ModMsgGet_c_str_v1(const char* get, const char* mod, const char* var, char *val, size_t *len, const char* ves) {
   string str;
-  if (!gCore.Get(string(get), _ID(mod, var, ves), &str)) {
-    return false;
-  }
-  if (str.length() >= *len) {
-    if (*len >= 1) val[0] = '\0';
-  } else {
-    strcpy_s(val, *len, str.c_str());
-  }
+  if (!gCore.Get(string(get), _ID(mod, var, ves), &str)) return false;
+  if (str.length() < *len) strcpy_s(val, *len, str.c_str());
   *len = str.length() + 1;
   return true;
 }
+
+DLLCLBK bool ModMsgFind_v1(const char* get, const char* findMod, const char* findVar, const char* findVes,
+                        bool skipSelf, int *fIx, char* typ,
+                        char* mod, size_t* lMod, char* var, size_t* lVar, char* ves, size_t* lVes) {
+  string fGet = get, fMod = findMod, fVar = findVar, fVes = (findVes?findVes:""), rMod, rVar, rVes;
+  if (!gCore.Find(fGet, fMod, fVar, fVes, fIx, skipSelf, &rMod, &rVar, &rVes, typ)) return false; 
+  if (rMod.length() < *lMod) strcpy_s(mod, *lMod, rMod.c_str());
+  *lMod = rMod.length() + 1;
+  if (rVar.length() < *lVar) strcpy_s(var, *lVar, rVar.c_str());
+  *lVar = rVar.length() + 1;
+  if (rVes.length() < *lVes) strcpy_s(ves, *lVes, rVes.c_str());
+  *lVes = rVes.length() + 1;
+  return true;
+}
+
