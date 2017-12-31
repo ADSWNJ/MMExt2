@@ -26,9 +26,6 @@
     <ClInclude Include="MMExt2_Core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MMExt2\__MMExt2_MMStruct.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CopyHPPtoOrbiter.bat">

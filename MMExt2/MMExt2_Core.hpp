@@ -30,6 +30,8 @@
 #include <string>
 #include <vector>
 #include <OrbiterSDK.h>
+#include "EnjoLib\ModuleMessagingExtBase.hpp"
+#include "MMExt2\__MMExt2_MMStruct.hpp"
 
 #define DLLEXPIMP __declspec(dllexport)
 
@@ -40,23 +42,12 @@ namespace MMExt2
 /*
 	Purpose:
 
-	Internal implementation of the Module Messaging Library.
+	Internal implementation of the Module Messaging Ext v2 Library 
 
 	Developer Instructions:
 
 	None. Do not call this directly or try to use this directly.
 */
-
-  struct MMStruct {
-  public:
-    MMStruct(unsigned int sVer, unsigned int sSize) : _sVer(sVer), _sSize(sSize) {};
-    virtual ~MMStruct() {};
-  private:
-    bool IsCorrectVersion(unsigned int sVer) const { return sVer == _sVer; }
-    bool IsCorrectSize(unsigned int sSize) const { return sSize == _sSize; }
-    unsigned int _sVer;
-    unsigned int _sSize;
-  };
 
 	class MMExt2_Core
 	{
@@ -72,6 +63,7 @@ namespace MMExt2
     static bool Put(const string& cli, const string& id, const MATRIX3& val);
     static bool Put(const string& cli, const string& id, const MATRIX4& val);
     static bool Put(const string& cli, const string& id, const MMStruct* val);
+    static bool Put(const string& cli, const string& id, const EnjoLib::ModuleMessagingExtBase* val);
 
     static bool Get(const string& cli, const string& id, int* val);
     static bool Get(const string& cli, const string& id, bool* val);
@@ -81,6 +73,7 @@ namespace MMExt2
     static bool Get(const string& cli, const string& id, MATRIX3* val);
     static bool Get(const string& cli, const string& id, MATRIX4* val);
     static bool Get(const string& cli, const string& id, const MMStruct** val);
+    static bool Get(const string& cli, const string& id, const EnjoLib::ModuleMessagingExtBase** val);
 
     static bool MMExt2_Core::Delete(const string& cli, const string& id, const char& c = '\0');
     static bool Find(const string& fGet, const string& fMod, const string& fVar, const string& fVes, int* fIx, bool skp, string* rMod, string* rVar, string* rVes, char* rTyp);
@@ -96,6 +89,7 @@ namespace MMExt2
 		template<class T> static bool SearchMap(const string& get, const string& id, const map<string, T>& mapToSearch, T* returnValue);
     template<class T> static bool SearchMapDelete(const string &id, map<string, T>& mapToSearch);
     template<class T> static bool PutMap(const string& cli, const string& id, const char& typ, map<string, T> &mapToStore, const T &val);
+
 		static const char m_token;
 		static map<string, bool> m_bools;
 		static map<string, int> m_ints;
@@ -105,6 +99,7 @@ namespace MMExt2
 		static map<string, MATRIX4> m_MATRIX4s;
     static map<string, string> m_strings;
     static map<string, const MMStruct*> m_MMStructs;
+    static map<string, const EnjoLib::ModuleMessagingExtBase*> m_MMBases;
     static map<string, char> m_types;
     static vector<string> m_activitylog;
 	};

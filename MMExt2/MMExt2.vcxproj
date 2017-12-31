@@ -94,7 +94,6 @@
     <ClCompile Include="MMExt2_Core.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MMExt2\__MMExt2_MMStruct.hpp" />
     <ClInclude Include="MMExt2_Core.hpp" />
   </ItemGroup>
   <ItemGroup>
