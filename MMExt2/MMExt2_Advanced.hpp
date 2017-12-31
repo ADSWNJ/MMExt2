@@ -61,7 +61,7 @@ namespace MMExt2
   private:
     Internal m_i;
   };
-
+  
   // Inline implementation allows this to be included in multiple compilation units 
   // Compiler and linker will determine best way to combine the compilation units
   template<typename T> inline bool Advanced::PutMMStruct(const char* var, const T val, const VESSEL* ves) const {
