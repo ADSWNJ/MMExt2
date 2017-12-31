@@ -7,7 +7,7 @@
 // dependencies. See your .\Orbitersdk\doc\ModuleMessagingExt.pdf
 // for full details. 
 //
-// Copyright  (C) 2014-2017 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes
+// Copyright  (C) 2014-2018 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes
 //                         All rights reserved
 //
 // MMExt v2 is free software: you can redistribute it

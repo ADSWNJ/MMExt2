@@ -2,7 +2,7 @@
 //         ORBITER AUX LIBRARY: Module Messaging Extended v2
 //                              DLL Interface Internal Header
 //
-// Copyright  (C) 2014-2017 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes
+// Copyright  (C) 2014-2018 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes
 //                         All rights reserved
 //
 // See MMExt2_Basic.hpp or MMExt2_Advanced.hpp  for license and usage information. 

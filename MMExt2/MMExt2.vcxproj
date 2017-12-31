@@ -94,10 +94,16 @@
     <ClCompile Include="MMExt2_Core.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MMExt2\__MMExt2_Internal.hpp" />
+    <ClInclude Include="MMExt2\__MMExt2_MMStruct.hpp" />
+    <ClInclude Include="MMExt2_Advanced.hpp" />
+    <ClInclude Include="MMExt2_Basic.hpp" />
     <ClInclude Include="MMExt2_Core.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CopyHPPtoOrbiter.bat" />
+    <None Include="Module Messaging Extended Library.docx" />
+    <None Include="Module Messaging Extended Library.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="lgpl.txt" />

@@ -5,7 +5,7 @@
 // Allows Orbiter modules to communicate with each other,
 // using predefined module and variable names.
 //
-// Copyright  (C) 2014-2016 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes
+// Copyright  (C) 2014-2018 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes
 //
 //                         All rights reserved
 //

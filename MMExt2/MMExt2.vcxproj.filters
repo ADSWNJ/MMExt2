@@ -16,6 +16,9 @@
     <Filter Include="Misc">
       <UniqueIdentifier>{2c8c81a1-c9df-4f5a-9631-3de03964217c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MMExt2">
+      <UniqueIdentifier>{8b8e4d49-396a-43b6-bea8-4729cb1c27ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MMExt2_Core.cpp">
@@ -26,9 +29,27 @@
     <ClInclude Include="MMExt2_Core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MMExt2_Advanced.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MMExt2_Basic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MMExt2\__MMExt2_Internal.hpp">
+      <Filter>Header Files\MMExt2</Filter>
+    </ClInclude>
+    <ClInclude Include="MMExt2\__MMExt2_MMStruct.hpp">
+      <Filter>Header Files\MMExt2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CopyHPPtoOrbiter.bat">
+      <Filter>Misc</Filter>
+    </None>
+    <None Include="Module Messaging Extended Library.pdf">
+      <Filter>Misc</Filter>
+    </None>
+    <None Include="Module Messaging Extended Library.docx">
       <Filter>Misc</Filter>
     </None>
   </ItemGroup>
