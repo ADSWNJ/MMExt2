@@ -39,24 +39,26 @@ namespace MMExt2
   {
   public:
     Basic(const char *mod) : m_i(mod) {};
-    bool Get(const char* mod, const char* var, bool* val) const           {return m_i._Get(mod, var, val);}
-    bool Get(const char* mod, const char* var, int* val) const            {return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, double* val) const         {return m_i._Get(mod, var, val);}
-    bool Get(const char* mod, const char* var, VECTOR3* val) const        {return m_i._Get(mod, var, val);}
-    bool Get(const char* mod, const char* var, MATRIX3* val) const        {return m_i._Get(mod, var, val);}
-    bool Get(const char* mod, const char* var, MATRIX4* val) const        {return m_i._Get(mod, var, val);}
-    bool Get(const char* mod, const char* var, std::string* val) const    {return m_i._Get(mod, var, val);}
-    bool Delete(const char* var) const                                    {return m_i._Del(var);}
-    bool Put(const char* var, const bool& val) const                      {return m_i._Put(var, val);}
-    bool Put(const char* var, const int& val) const                       {return m_i._Put(var, val);}
-    bool Put(const char* var, const double& val) const                    {return m_i._Put(var, val);}
-    bool Put(const char* var, const VECTOR3& val) const                   {return m_i._Put(var, val);}
-    bool Put(const char* var, const MATRIX3& val) const                   {return m_i._Put(var, val);}
-    bool Put(const char* var, const MATRIX4& val) const                   {return m_i._Put(var, val);}
-    bool Put(const char* var, const std::string& val) const               {return m_i._Put(var, val);}
-    bool Put(const char* var, const char *val) const                      {return m_i._Put(var, std::string(val));}
-    Internal m_i;
+    bool Get(const char* mod, const char* var, bool* val) const           { return m_i._Get(mod, var, val); }
+    bool Get(const char* mod, const char* var, int* val) const            { return m_i._Get(mod, var, val); }
+    bool Get(const char* mod, const char* var, double* val) const         { return m_i._Get(mod, var, val); }
+    bool Get(const char* mod, const char* var, VECTOR3* val) const        { return m_i._Get(mod, var, val); }
+    bool Get(const char* mod, const char* var, MATRIX3* val) const        { return m_i._Get(mod, var, val); }
+    bool Get(const char* mod, const char* var, MATRIX4* val) const        { return m_i._Get(mod, var, val); }
+    bool Get(const char* mod, const char* var, OBJHANDLE* val) const      { return m_i._Get(mod, var, val); }
+    bool Get(const char* mod, const char* var, std::string* val) const    { return m_i._Get(mod, var, val); }
+    bool Delete(const char* var) const                                    { return m_i._Del(var); }
+    bool Put(const char* var, const bool& val) const                      { return m_i._Put(var, val); }
+    bool Put(const char* var, const int& val) const                       { return m_i._Put(var, val); }
+    bool Put(const char* var, const double& val) const                    { return m_i._Put(var, val); }
+    bool Put(const char* var, const VECTOR3& val) const                   { return m_i._Put(var, val); }
+    bool Put(const char* var, const MATRIX3& val) const                   { return m_i._Put(var, val); }
+    bool Put(const char* var, const MATRIX4& val) const                   { return m_i._Put(var, val); }
+    bool Put(const char* var, const OBJHANDLE& val) const                 { return m_i._Put(var, val); }
+    bool Put(const char* var, const std::string& val) const               { return m_i._Put(var, val); }
+    bool Put(const char* var, const char *val) const                      { return m_i._Put(var, std::string(val)); }
   private:
+    Internal m_i;
   };
 }
 #endif // MMExt2_Basic_H

@@ -58,6 +58,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessToFile>false</PreprocessToFile>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <OutputFile>$(ModuleDir)\$(ProjectName).dll</OutputFile>
@@ -80,6 +81,7 @@
       <PreprocessToFile>false</PreprocessToFile>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <EnablePREfast>true</EnablePREfast>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

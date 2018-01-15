@@ -28,6 +28,8 @@
 #include <algorithm>
 #include <sstream>
 
+#pragma warning( default : 4571 ) // Enables exception on try/catch with no SEH enabled - i.e. C++ Code Generation, Enable C++ Exceptions, Yes with SEH exceptions (/EHa).
+
 using namespace MMExt2;
 using namespace std;
 
@@ -44,6 +46,7 @@ map<string, MATRIX4> MMExt2_Core::m_MATRIX4s;
 map<string, string> MMExt2_Core::m_strings;
 map<string, const MMStruct*> MMExt2_Core::m_MMStructs;
 map<string, const EnjoLib::ModuleMessagingExtBase*> MMExt2_Core::m_MMBases;
+map<string, OBJHANDLE> MMExt2_Core::m_OBJHANDLEs;
 map<string, char> MMExt2_Core::m_types;
 vector<string>  MMExt2_Core::m_activitylog;
 const char MMExt2_Core::m_token = char(TOKEN_VALUE);
@@ -52,12 +55,29 @@ MMExt2_Core::MMExt2_Core() {}
 
 MMExt2_Core::~MMExt2_Core() {}
 
-inline std::string _Id(const char* mod, const char* var, const char* ves) {
+inline bool _IsVessel(OBJHANDLE ohv) {
+  int obj_type = OBJTP_INVALID;
+  try {
+    obj_type = oapiGetObjectType(ohv); // if bad pointer, we can Access Violate on this call, so be very defensive around it. 
+  }
+  catch (...) { // If you get C4571 compile error here, you must enable /EHa to catch structured exceptions- i.e. C++ Code Generation, Enable C++ Exceptions, Yes with SEH exceptions (/EHa).
+    obj_type = OBJTP_INVALID;
+  }
+  return (obj_type == OBJTP_VESSEL);
+}
+
+inline std::string _Id(const char* mod, const char* var, const OBJHANDLE ohv, const bool allowNullOhv = false) {
   const char token = char(TOKEN_VALUE);
-  string id = "", s_ves = ves, s_mod = mod, s_var = var;
-  if (s_ves.length() == 0 || s_mod.length() == 0 || s_var.length() == 0) return id;
-  if (s_ves.find(token) != -1 || s_mod.find(token) != -1 || s_var.find(token) != -1) return id;
-  id = s_ves + token + s_mod + token + s_var;
+  string id = "", s_ohv = "", s_mod = mod, s_var = var;
+  if (!allowNullOhv) {
+    if (!_IsVessel(ohv)) return id;
+  }
+  char c_ohv[32];
+  sprintf_s(c_ohv, 32, "%p", ohv);
+  s_ohv = c_ohv;
+  if (s_mod.length() == 0 || s_var.length() == 0) return id;
+  if (s_mod.find(token) != -1 || s_var.find(token) != -1) return id;
+  id = s_ohv + token + s_mod + token + s_var;
   return id;
 }
 
@@ -84,20 +104,25 @@ static bool MMExt2_Core::SearchMapDelete(const string &id, map<string, T>& mapTo
 }
 
 template<class T>
-static bool MMExt2_Core::PutMap(const string& cli, const string& id, const char& typ, map<string, T> &mapToStore, const T &val) {
+static bool MMExt2_Core::PutMap(const string& cli, const string& id, const char& typ, map<string, T> &mapToStore, const T& val) {
   if (!Delete(cli, id, typ)) return false;
   m_types[id] = typ;
   mapToStore[id] = val;
   return Log(cli, "P", true, id);
 }
 
-bool MMExt2_Core::Put(const string& cli, const string& id, const bool& val)      { return PutMap<bool>(cli, id, 'b', m_bools, val); }
-bool MMExt2_Core::Put(const string& cli, const string& id, const int& val)       { return PutMap<int>(cli, id, 'i', m_ints, val); }
-bool MMExt2_Core::Put(const string& cli, const string& id, const double& val)    { return PutMap<double>(cli, id, 'd', m_doubles, val); }
-bool MMExt2_Core::Put(const string& cli, const string& id, const string& val)    { return PutMap<string>(cli, id, 's', m_strings, val); }
-bool MMExt2_Core::Put(const string& cli, const string& id, const VECTOR3& val)   { return PutMap<VECTOR3>(cli, id, 'v', m_VECTOR3s, val); }
-bool MMExt2_Core::Put(const string& cli, const string& id, const MATRIX3& val)   { return PutMap<MATRIX3>(cli, id, '3', m_MATRIX3s, val); }
-bool MMExt2_Core::Put(const string& cli, const string& id, const MATRIX4& val)   { return PutMap<MATRIX4>(cli, id, '4', m_MATRIX4s, val); }
+bool MMExt2_Core::Put(const string& cli, const string& id, const bool& val)      { return PutMap<bool>(     cli, id, 'b', m_bools,      val); }
+bool MMExt2_Core::Put(const string& cli, const string& id, const int& val)       { return PutMap<int>(      cli, id, 'i', m_ints,       val); }
+bool MMExt2_Core::Put(const string& cli, const string& id, const double& val)    { return PutMap<double>(   cli, id, 'd', m_doubles,    val); }
+bool MMExt2_Core::Put(const string& cli, const string& id, const string& val)    { return PutMap<string>(   cli, id, 's', m_strings,    val); }
+bool MMExt2_Core::Put(const string& cli, const string& id, const VECTOR3& val)   { return PutMap<VECTOR3>(  cli, id, 'v', m_VECTOR3s,   val); }
+bool MMExt2_Core::Put(const string& cli, const string& id, const MATRIX3& val)   { return PutMap<MATRIX3>(  cli, id, '3', m_MATRIX3s,   val); }
+bool MMExt2_Core::Put(const string& cli, const string& id, const MATRIX4& val)   { return PutMap<MATRIX4>(  cli, id, '4', m_MATRIX4s,   val); }
+
+bool MMExt2_Core::Put(const string& cli, const string& id, const OBJHANDLE& val) {
+  if (!ValidateObjHandle(cli, id, val)) return false;
+  return PutMap<OBJHANDLE>(cli, id, 'o', m_OBJHANDLEs, val);
+}
 
 bool MMExt2_Core::Put(const string& cli, const string& id, const MMStruct* val)  {
   if (!Delete(cli, id, 'x')) return false;
@@ -113,13 +138,45 @@ bool MMExt2_Core::Put(const string& cli, const string& id, const EnjoLib::Module
   return Log(cli, "P", true, id);
 }
 
-bool MMExt2_Core::Get(const string& cli, const string& id, int* val)             { return SearchMap<int>(    cli, id, m_ints,     val); }
-bool MMExt2_Core::Get(const string& cli, const string& id, bool* val)            { return SearchMap<bool>(   cli, id, m_bools,    val); }
-bool MMExt2_Core::Get(const string& cli, const string& id, double* val)          { return SearchMap<double>( cli, id, m_doubles,  val); }
-bool MMExt2_Core::Get(const string& cli, const string& id, string* val)          { return SearchMap<string>( cli, id, m_strings,  val); }
-bool MMExt2_Core::Get(const string& cli, const string& id, VECTOR3* val)         { return SearchMap<VECTOR3>(cli, id, m_VECTOR3s, val); }
-bool MMExt2_Core::Get(const string& cli, const string& id, MATRIX3* val)         { return SearchMap<MATRIX3>(cli, id, m_MATRIX3s, val); }
-bool MMExt2_Core::Get(const string& cli, const string& id, MATRIX4* val)         { return SearchMap<MATRIX4>(cli, id, m_MATRIX4s, val); }
+bool MMExt2_Core::Get(const string& cli, const string& id, int* val)             { return SearchMap<int>(      cli, id, m_ints,       val); }
+bool MMExt2_Core::Get(const string& cli, const string& id, bool* val)            { return SearchMap<bool>(     cli, id, m_bools,      val); }
+bool MMExt2_Core::Get(const string& cli, const string& id, double* val)          { return SearchMap<double>(   cli, id, m_doubles,    val); }
+bool MMExt2_Core::Get(const string& cli, const string& id, string* val)          { return SearchMap<string>(   cli, id, m_strings,    val); }
+bool MMExt2_Core::Get(const string& cli, const string& id, VECTOR3* val)         { return SearchMap<VECTOR3>(  cli, id, m_VECTOR3s,   val); }
+bool MMExt2_Core::Get(const string& cli, const string& id, MATRIX3* val)         { return SearchMap<MATRIX3>(  cli, id, m_MATRIX3s,   val); }
+bool MMExt2_Core::Get(const string& cli, const string& id, MATRIX4* val)         { return SearchMap<MATRIX4>(  cli, id, m_MATRIX4s,   val); }
+
+bool MMExt2_Core::Get(const string& cli, const string& id, OBJHANDLE* val){
+  bool ret = SearchMap<OBJHANDLE>(cli, id, m_OBJHANDLEs, val);
+  if (!ret) return false;
+  return ValidateObjHandle(cli, id, *val);
+}
+
+bool MMExt2_Core::ValidateObjHandle(const string& cli, const string& id, const OBJHANDLE obj) {
+  int obj_type = OBJTP_INVALID;
+  try {
+    obj_type = oapiGetObjectType(obj); // if bad pointer, we can Access Violate on this call, so be very defensive around it. 
+  }
+  catch (...) { // see pragma 4571 at top of this code if you get compile error here
+    obj_type = OBJTP_INVALID;
+  }
+  if (obj_type != OBJTP_INVALID) return true; 
+  Delete("{core}", id, '\0'); // Expunge bad objects from the core
+  return false;
+}
+
+bool MMExt2_Core::ValidateObjIsVessel(const OBJHANDLE obj) {
+  int obj_type = OBJTP_INVALID;
+  try {
+    obj_type = oapiGetObjectType(obj); // if bad pointer, we can Access Violate on this call, so be very defensive around it. 
+  }
+  catch (...) { // If you get C4571 compile error here, you must enable /EHa to catch structured exceptions- i.e. C++ Code Generation, Enable C++ Exceptions, Yes with SEH exceptions (/EHa).
+    obj_type = OBJTP_INVALID;
+  }
+  return (obj_type == OBJTP_VESSEL);
+}
+
+
 bool MMExt2_Core::Get(const string& cli, const string& id, const MMStruct** val) { return SearchMap<const MMStruct *>(cli, id, m_MMStructs, val); }
 bool MMExt2_Core::Get(const string& cli, const string& id, const EnjoLib::ModuleMessagingExtBase** val) { return SearchMap<const EnjoLib::ModuleMessagingExtBase *>(cli, id, m_MMBases, val); }
 
@@ -138,40 +195,71 @@ bool MMExt2_Core::Delete(const string& cli, const string& id, const char& c) {
 bool MMExt2_Core::DeleteType(const string &id, const char type) {
   bool delFound = false;
   switch (type) {
-  case 'i':    delFound = SearchMapDelete<int>(id, m_ints);          break;
-  case 'b':    delFound = SearchMapDelete<bool>(id, m_bools);        break;
-  case 'd':    delFound = SearchMapDelete<double>(id, m_doubles);    break;
-  case 's':    delFound = SearchMapDelete<string>(id, m_strings);    break;
-  case 'v':    delFound = SearchMapDelete<VECTOR3>(id, m_VECTOR3s);  break;
-  case '3':    delFound = SearchMapDelete<MATRIX3>(id, m_MATRIX3s);  break;
-  case '4':    delFound = SearchMapDelete<MATRIX4>(id, m_MATRIX4s);  break;
+  case 'i':    delFound = SearchMapDelete<int>(id, m_ints);              break;
+  case 'b':    delFound = SearchMapDelete<bool>(id, m_bools);            break;
+  case 'd':    delFound = SearchMapDelete<double>(id, m_doubles);        break;
+  case 's':    delFound = SearchMapDelete<string>(id, m_strings);        break;
+  case 'v':    delFound = SearchMapDelete<VECTOR3>(id, m_VECTOR3s);      break;
+  case 'o':    delFound = SearchMapDelete<OBJHANDLE>(id, m_OBJHANDLEs);  break;
+  case '3':    delFound = SearchMapDelete<MATRIX3>(id, m_MATRIX3s);      break;
+  case '4':    delFound = SearchMapDelete<MATRIX4>(id, m_MATRIX4s);      break;
   }
   return delFound;
 }
 
 bool MMExt2_Core::Log(const string& cli, const string& act, const bool& res, const string& id) {
-  string s = id;
-  if (s == "") s = string() + "*" + m_token + "*" + m_token + "*";
+  string sohv, ves, mod, var;
+  OBJHANDLE ohv;
+  string s = (id == ""? string() + "00000000" + m_token + "*" + m_token + "*" : id);
+
+  istringstream is(s);
+  getline(is, sohv, m_token);
+  sscanf(sohv.c_str(), "%p", &ohv);
+  getline(is, mod, m_token);
+  getline(is, var, m_token);
+  if (!ohv) {
+    ves = "*";
+  } else {
+    if (!_IsVessel(ohv)) return false;
+    ves = oapiGetVesselInterface(ohv)->GetName();
+  }
+
+  s = string() + ves + m_token + mod + m_token + var;
   string logmsg = cli + m_token + act + m_token + (res?"S":"F") + m_token + s; 
   auto it = find(m_activitylog.begin(),m_activitylog.end(),logmsg);
   if (it == m_activitylog.end()) m_activitylog.push_back(logmsg);
   return res;
 }
 
-bool MMExt2_Core::GetLog(const string& get, const int ix, char *rFunc, bool *rSuccess, string *rCli, string *rMod, string* rVar, string* rVes) {
-  if (ix == 0) Log(get, "L", true, "");
-  int rIx = m_activitylog.size() - ix - 1;
-  if (rIx < 0) return false;
-  string func, success;
-  istringstream is(m_activitylog[rIx]);
-  getline(is, *rCli, m_token);
-  getline(is, func, m_token);
-  getline(is, success, m_token);
-  getline(is, *rVes, m_token);
-  getline(is, *rMod, m_token);
-  getline(is, *rVar, m_token);
-  *rFunc = func[0];
-  *rSuccess = (success == "S");
+bool MMExt2_Core::GetLog(char *rFunc, string *rCli, string *rMod, string* rVar, string* rVes, bool *rSuccess, int* ix, const string& cli, bool skp) {
+  if (*ix == 0) Log(cli, "L", true, "");
+  int rIx;
+  bool repeat;
+  do {
+    repeat = false;
+    rIx = m_activitylog.size() - *ix - 1;
+    if (rIx < 0) return false;
+    string func, success;
+    istringstream is(m_activitylog[rIx]);
+    getline(is, *rCli, m_token);
+    getline(is, func, m_token);
+    getline(is, success, m_token);
+    getline(is, *rVes, m_token);
+    getline(is, *rMod, m_token);
+    getline(is, *rVar, m_token);
+    *rFunc = func[0];
+    *rSuccess = (success == "S");
+    if (skp && (*rCli == cli)) {
+      (*ix)++;
+      repeat = true;
+    }
+  } while (repeat);
+  (*ix)++;
+  return true;
+}
+
+bool MMExt2_Core::ResetLog() {
+  m_activitylog.clear();
   return true;
 }
 
@@ -184,27 +272,47 @@ bool MMExt2_Core::GetVer(const char* mod, char* val, size_t *len) {
   return Log(mod, "V", true, "");
 }
 
-bool MMExt2_Core::Find(const string& fGet, const string& fMod, const string& fVar, const string& fVes, int* fIx, bool skp, string* rMod, string* rVar, string* rVes, char* rTyp) {
-  int foundIx = 0;
-  string itVes, itMod, itVar;
-  for (const auto& it : m_types) {
-    istringstream is(it.first);
-    getline(is, itVes, m_token);
-    getline(is, itMod, m_token);
-    getline(is, itVar, m_token);
-    if (((fMod == "*") || (fMod == itMod)) && ((fVar == "*") || (fVar == itVar)) && ((fVes == "*") || (fVes == itVes)) && ((!skp) || (fGet != itMod))) {
-      if (foundIx >= *fIx) {
-        *rTyp = it.second;
-        *rMod = itMod;
-        *rVar = itVar;
-        *rVes = itVes;
-        if (*fIx == 0) Log(fGet, "F", true, fVes + m_token + fMod + m_token + fVar);
-        return true;
-      } else {
-        foundIx++;
+bool MMExt2_Core::Find(char* rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int* ix, const string& cli, const string& mod, const string& var, const OBJHANDLE ohv, bool skp) {
+  int foundIx;
+  string itsOhv, itMod, itVar, id;
+  OBJHANDLE itOhv;
+  bool doAgain;
+  do {
+    foundIx = 0;
+    doAgain = false;
+    for (const auto& it : m_types) {
+      istringstream is(it.first);
+      getline(is, itsOhv, m_token);
+      sscanf(itsOhv.c_str(), "%p", &itOhv);
+      getline(is, itMod, m_token);
+      getline(is, itVar, m_token);
+      id = _Id((itMod).c_str(), (itVar).c_str(), itOhv);
+      if (!ValidateObjHandle(cli, id, itOhv)) {
+        doAgain = true; // invalidated pointers now on the m_types, so retry from beginning
+        break;
       }
+
+      if (((mod == "*") || (mod == itMod)) && ((var == "*") || (var == itVar)) && ((ohv == NULL) || (ohv == itOhv)) && ((!skp) || (cli != itMod))) {
+        if (foundIx >= *ix) {
+          *rTyp = it.second;
+          *rMod = itMod;
+          *rVar = itVar;
+          *rOhv = itOhv;
+          if (*rTyp == 'o') {
+            OBJHANDLE obj_handle;
+            SearchMap<OBJHANDLE>(cli, id, m_OBJHANDLEs, &obj_handle); // we know it will be true
+            if (!ValidateObjHandle(cli, id, obj_handle)) {
+              doAgain = true; // invalidated pointers now on the m_types
+              break;
+            }
+          }
+          if (*ix == 0) Log(cli, "F", true, _Id(mod.c_str(), var.c_str(), ohv, true));
+          return true;
+        }
+      }
+      foundIx++;
     }
-  }
+  } while (doAgain);
   return false;
 }
 
@@ -213,63 +321,69 @@ bool MMExt2_Core::Find(const string& fGet, const string& fMod, const string& fVa
 // If you change this interface, make a new V2, V3 set of entry points and fix up the compatibility for all apps using these original ones. 
 //
 
-DLLCLBK bool ModMsgGet_ver_v1(                      const char* mod,                  char* val, size_t *len)                { return gCore.GetVer(mod, val, len); };
-DLLCLBK bool ModMsgPut_int_v1(                      const char* mod, const char* var, const int& val,       const char* ves) { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgPut_bool_v1(                     const char* mod, const char* var, const bool& val,      const char* ves) { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgPut_double_v1(                   const char* mod, const char* var, const double& val,    const char* ves) { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgPut_VECTOR3_v1(                  const char* mod, const char* var, const VECTOR3& val,   const char* ves) { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgPut_MATRIX3_v1(                  const char* mod, const char* var, const MATRIX3& val,   const char* ves) { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgPut_MATRIX4_v1(                  const char* mod, const char* var, const MATRIX4& val,   const char* ves) { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgPut_MMStruct_v1(                 const char* mod, const char* var, const MMStruct* val,  const char* ves) { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgPut_MMBase_v1(                   const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase* val, const char* ves)
-                                                                                                                             { return gCore.Put(string(mod), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgDel_any_v1(     const char* mod, const char* var, const char* ves) { return gCore.Delete(mod, _Id(mod, var, ves)); }
-DLLCLBK bool ModMsgGet_int_v1(     const char* cli, const char* mod, const char* var, int* val,             const char* ves) { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgGet_bool_v1(    const char* cli, const char* mod, const char* var, bool* val,            const char* ves) { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgGet_double_v1(  const char* cli, const char* mod, const char* var, double* val,          const char* ves) { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgGet_VECTOR3_v1( const char* cli, const char* mod, const char* var, VECTOR3* val,         const char* ves) { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgGet_MATRIX3_v1( const char* cli, const char* mod, const char* var, MATRIX3* val,         const char* ves) { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgGet_MATRIX4_v1( const char* cli, const char* mod, const char* var, MATRIX4* val,         const char* ves) { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgGet_MMStruct_v1(const char* cli, const char* mod, const char* var, const MMStruct** val, const char* ves) { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
-DLLCLBK bool ModMsgGet_MMBase_v1(const char* cli, const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase** val, const char* ves)
-                                                                                                                             { return gCore.Get(string(cli), _Id(mod, var, ves), val); }
+DLLCLBK bool ModMsgGet_ver_v1(                       const char* mod,                  char* val, size_t *len)                    { return gCore.GetVer(mod, val, len); };
+DLLCLBK bool ModMsgPut_int_v1(                       const char* mod, const char* var, const int& val,       const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_bool_v1(                      const char* mod, const char* var, const bool& val,      const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_double_v1(                    const char* mod, const char* var, const double& val,    const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_VECTOR3_v1(                   const char* mod, const char* var, const VECTOR3& val,   const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_MATRIX3_v1(                   const char* mod, const char* var, const MATRIX3& val,   const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_MATRIX4_v1(                   const char* mod, const char* var, const MATRIX4& val,   const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_OBJHANDLE_v1(                 const char* mod, const char* var, const OBJHANDLE& val, const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_MMStruct_v1(                  const char* mod, const char* var, const MMStruct* val,  const OBJHANDLE ohv) { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgPut_MMBase_v1(                    const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase* val, const OBJHANDLE ohv)
+                                                                                                                                  { return gCore.Put(string(mod), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgDel_any_v1(                       const char* mod, const char* var, const OBJHANDLE ohv)                       { return gCore.Delete(mod, _Id(mod, var, ohv)); }
+DLLCLBK bool ModMsgGet_int_v1(      const char* cli, const char* mod, const char* var, int* val,             const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_bool_v1(     const char* cli, const char* mod, const char* var, bool* val,            const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_double_v1(   const char* cli, const char* mod, const char* var, double* val,          const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_VECTOR3_v1(  const char* cli, const char* mod, const char* var, VECTOR3* val,         const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_MATRIX3_v1(  const char* cli, const char* mod, const char* var, MATRIX3* val,         const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_MATRIX4_v1(  const char* cli, const char* mod, const char* var, MATRIX4* val,         const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_OBJHANDLE_v1(const char* cli, const char* mod, const char* var, OBJHANDLE* val,       const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_MMStruct_v1( const char* cli, const char* mod, const char* var, const MMStruct** val, const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK bool ModMsgGet_MMBase_v1(   const char* cli, const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase** val, const OBJHANDLE ohv)
+                                                                                                                                  { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
 
 // Special handling for all string functions (do not want to expose the string implementation across compiler versions due to lack of ABI; therefore use char* as the interface)
 
-DLLCLBK bool ModMsgPut_c_str_v1(const char* mod, const char* var, const char* val, const char* ves) {
+DLLCLBK bool ModMsgPut_c_str_v1(const char* mod, const char* var, const char* val, const OBJHANDLE ohv) {
   string str = val;
-  return gCore.Put(string(mod), _Id(mod, var, ves), str);
+  return gCore.Put(string(mod), _Id(mod, var, ohv), str);
 }
 
-DLLCLBK bool ModMsgGet_c_str_v1(const char* cli, const char* mod, const char* var, char *val, size_t *lVal, const char* ves) {
+DLLCLBK bool ModMsgGet_c_str_v1(const char* cli, const char* mod, const char* var, char *val, size_t *lVal, const OBJHANDLE ohv) {
   string rVal;
-  if (!gCore.Get(string(cli), _Id(mod, var, ves), &rVal)) return false;
+  if (!gCore.Get(string(cli), _Id(mod, var, ohv), &rVal)) return false;
   _RemoteCopy(val, lVal, rVal);
   return true;
 }
 
-DLLCLBK bool ModMsgFind_v1(const char* cli, const char* findMod, const char* findVar, const char* findVes,
-                        bool skipSelf, int *fIx, char* typ,
-                        char* mod, size_t* lMod, char* var, size_t* lVar, char* ves, size_t* lVes) {
-  string fGet = cli, fMod = findMod, fVar = findVar, fVes = findVes, rMod, rVar, rVes;
-  if (!gCore.Find(fGet, fMod, fVar, fVes, fIx, skipSelf, &rMod, &rVar, &rVes, typ)) return false; 
-  _RemoteCopy(mod, lMod, rMod);
-  _RemoteCopy(var, lVar, rVar);
-  _RemoteCopy(ves, lVes, rVes);
+
+DLLCLBK bool ModMsgFind_v1(char *rTyp, char *rMod, size_t *lMod, char *rVar, size_t *lVar, OBJHANDLE* rOhv, int* ix,
+                           const char* cli, const char* mod, const char* var, const OBJHANDLE ohv, const bool skpSelf) {
+  string iCli = cli, iMod = mod, iVar = var, irMod, irVar;
+  if (!gCore.Find(rTyp, &irMod, &irVar, rOhv, ix, iCli, iMod, iVar, ohv, skpSelf)) return false;
+  _RemoteCopy(rMod, lMod, irMod);
+  _RemoteCopy(rVar, lVar, irVar);
   return true;
 }
 
-DLLCLBK bool ModMsgGet_log_v1(const char* get, const int ix, char* func, bool* success,
-                              char *cli, size_t* lCli,
-                              char* mod, size_t* lMod,
-                              char* var, size_t* lVar,
-                              char* ves, size_t* lVes) {
-  string rGet = get, rCli, rMod, rVar, rVes;
-  if (!gCore.GetLog(rGet, ix, func, success, &rCli, &rMod, &rVar, &rVes)) return false;
+DLLCLBK bool ModMsgGet_log_v1(char* rFunc, 
+                              char* rCli, size_t* lCli,
+                              char* rMod, size_t* lMod,
+                              char* rVar, size_t* lVar,
+                              char* rVes, size_t* lVes,
+                              bool* rSucc, int *ix,
+                              const char* get, const bool skp ) {
+  string iCli, iMod, iVar, iVes;
+  if (!gCore.GetLog(rFunc, &iCli, &iMod, &iVar, &iVes, rSucc, ix, get, skp)) return false;
 
-  _RemoteCopy(cli, lCli, rCli);
-  _RemoteCopy(mod, lMod, rMod);
-  _RemoteCopy(var, lVar, rVar);
-  _RemoteCopy(ves, lVes, rVes);
+  _RemoteCopy(rCli, lCli, iCli);
+  _RemoteCopy(rMod, lMod, iMod);
+  _RemoteCopy(rVar, lVar, iVar);
+  _RemoteCopy(rVes, lVes, iVes);
   return true;
 }
+
+DLLCLBK bool ModMsgRst_log_v1() { return gCore.ResetLog(); }
+

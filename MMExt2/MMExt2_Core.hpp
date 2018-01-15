@@ -46,7 +46,7 @@ namespace MMExt2
 
 	Developer Instructions:
 
-	None. Do not call this directly or try to use this directly.
+	None. Do not try to call this directly. This is always in MMExt2.dll and called through the static entry points from the _MMExt2_Internal implementation
 */
 
 	class MMExt2_Core
@@ -62,6 +62,7 @@ namespace MMExt2
     static bool Put(const string& cli, const string& id, const VECTOR3& val);
     static bool Put(const string& cli, const string& id, const MATRIX3& val);
     static bool Put(const string& cli, const string& id, const MATRIX4& val);
+    static bool Put(const string& cli, const string& id, const OBJHANDLE& val);
     static bool Put(const string& cli, const string& id, const MMStruct* val);
     static bool Put(const string& cli, const string& id, const EnjoLib::ModuleMessagingExtBase* val);
 
@@ -72,19 +73,24 @@ namespace MMExt2
     static bool Get(const string& cli, const string& id, VECTOR3* val);
     static bool Get(const string& cli, const string& id, MATRIX3* val);
     static bool Get(const string& cli, const string& id, MATRIX4* val);
+    static bool Get(const string& cli, const string& id, OBJHANDLE* val);
     static bool Get(const string& cli, const string& id, const MMStruct** val);
     static bool Get(const string& cli, const string& id, const EnjoLib::ModuleMessagingExtBase** val);
 
     static bool MMExt2_Core::Delete(const string& cli, const string& id, const char& c = '\0');
-    static bool Find(const string& fGet, const string& fMod, const string& fVar, const string& fVes, int* fIx, bool skp, string* rMod, string* rVar, string* rVes, char* rTyp);
+    static bool Find(char* rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int* ix, const string& cli, const string& mod, const string& var, const OBJHANDLE ohv, bool skp);
 
     static bool GetVer(const char* mod, char* val, size_t *len);
-    static bool GetLog(const string& get, const int ix, char *func, bool *success, string *rCli, string *rMod, string* rVar, string* rVes);
+    static bool GetLog(char *func, string *rCli, string *rMod, string* rVar, string* rVes, bool *success, int* ix, const string& cli, bool skp);
+    static bool ResetLog();
 
 	protected:
 	private:
     static bool Log(const string& cli, const string& act, const bool& res, const string& id);
     static bool DeleteType(const string &id, const char type);
+
+    static bool ValidateObjHandle(const string& cli, const string& id, const OBJHANDLE obj);
+    static bool ValidateObjIsVessel(const OBJHANDLE obj);
 
 		template<class T> static bool SearchMap(const string& get, const string& id, const map<string, T>& mapToSearch, T* returnValue);
     template<class T> static bool SearchMapDelete(const string &id, map<string, T>& mapToSearch);
@@ -100,6 +106,7 @@ namespace MMExt2
     static map<string, string> m_strings;
     static map<string, const MMStruct*> m_MMStructs;
     static map<string, const EnjoLib::ModuleMessagingExtBase*> m_MMBases;
+    static map<string, OBJHANDLE> m_OBJHANDLEs;
     static map<string, char> m_types;
     static vector<string> m_activitylog;
 	};
