@@ -33,30 +33,32 @@
 #include <string>
 
 #include ".\MMExt2\__MMExt2_Internal.hpp"
+using namespace std;
 namespace MMExt2
 {
   class Basic
   {
   public:
-    Basic(const char *mod) : m_i(mod) {};
-    bool Get(const char* mod, const char* var, bool* val) const           { return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, int* val) const            { return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, double* val) const         { return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, VECTOR3* val) const        { return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, MATRIX3* val) const        { return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, MATRIX4* val) const        { return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, OBJHANDLE* val) const      { return m_i._Get(mod, var, val); }
-    bool Get(const char* mod, const char* var, std::string* val) const    { return m_i._Get(mod, var, val); }
-    bool Delete(const char* var) const                                    { return m_i._Del(var); }
-    bool Put(const char* var, const bool& val) const                      { return m_i._Put(var, val); }
-    bool Put(const char* var, const int& val) const                       { return m_i._Put(var, val); }
-    bool Put(const char* var, const double& val) const                    { return m_i._Put(var, val); }
-    bool Put(const char* var, const VECTOR3& val) const                   { return m_i._Put(var, val); }
-    bool Put(const char* var, const MATRIX3& val) const                   { return m_i._Put(var, val); }
-    bool Put(const char* var, const MATRIX4& val) const                   { return m_i._Put(var, val); }
-    bool Put(const char* var, const OBJHANDLE& val) const                 { return m_i._Put(var, val); }
-    bool Put(const char* var, const std::string& val) const               { return m_i._Put(var, val); }
-    bool Put(const char* var, const char *val) const                      { return m_i._Put(var, std::string(val)); }
+    Basic(const string mod) : m_i(mod) {};
+    bool Get(const string mod, const string var, bool* val) const      { return m_i._Get(mod, var, val); }
+    bool Get(const string mod, const string var, int* val) const       { return m_i._Get(mod, var, val); }
+    bool Get(const string mod, const string var, double* val) const    { return m_i._Get(mod, var, val); }
+    bool Get(const string mod, const string var, VECTOR3* val) const   { return m_i._Get(mod, var, val); }
+    bool Get(const string mod, const string var, MATRIX3* val) const   { return m_i._Get(mod, var, val); }
+    bool Get(const string mod, const string var, MATRIX4* val) const   { return m_i._Get(mod, var, val); }
+    bool Get(const string mod, const string var, OBJHANDLE* val) const { return m_i._Get(mod, var, val); }
+    bool Get(const string mod, const string var, string* val) const    { return m_i._Get(mod, var, val); }
+    bool Delete(const string var) const                                { return m_i._Del(var); }
+    bool Put(const string var, const bool& val) const                  { return m_i._Put(var, val); }
+    bool Put(const string var, const int& val) const                   { return m_i._Put(var, val); }
+    bool Put(const string var, const double& val) const                { return m_i._Put(var, val); }
+    bool Put(const string var, const VECTOR3& val) const               { return m_i._Put(var, val); }
+    bool Put(const string var, const MATRIX3& val) const               { return m_i._Put(var, val); }
+    bool Put(const string var, const MATRIX4& val) const               { return m_i._Put(var, val); }
+    bool Put(const string var, const OBJHANDLE& val) const             { return m_i._Put(var, val); }
+    bool Put(const string var, const string& val) const                { return m_i._Put(var, val); }
+    bool Put(const string var, const char* val) const                  { return m_i._Put(var, string(val)); }
+    int  ObjType(const OBJHANDLE& val) const                           { return m_i._ObjType(val); }
   private:
     Internal m_i;
   };

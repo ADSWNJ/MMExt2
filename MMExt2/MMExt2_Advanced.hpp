@@ -34,43 +34,47 @@
 #include ".\MMExt2\__MMExt2_Internal.hpp"
 #define _myOhv oapiGetFocusInterface()->GetHandle()
 
+using namespace std;
 namespace MMExt2
 {
 
   class Advanced {
   public:
     Advanced(const char *mod) : m_i(mod) {};
-    template<typename T> bool Get(const char* mod, const char* var, T* val, const OBJHANDLE ohv = _myOhv) const       {return m_i._Get(mod, var, val, ohv);}
-    bool Delete(const char* var, const OBJHANDLE ohv = _myOhv) const                                                  {return m_i._Del(var, ohv);}
-    bool Put(const char* var, const char *val, const OBJHANDLE ohv = _myOhv) const                                    {return m_i._Put(var, std::string(val), ohv);}
-    template<typename T> bool Put(const char* var, const T& val, const OBJHANDLE ohv = _myOhv) const                  {return m_i._Put(var, val, ohv);}
+    template<typename T> bool Get(const string mod, const string var, T* val, const OBJHANDLE ohv = _myOhv) const  { return m_i._Get(mod, var, val, ohv); }
+    bool Delete(const string var, const OBJHANDLE ohv = _myOhv) const                                              { return m_i._Del(var, ohv); }
+    bool Put(const string var, const char *val,   const OBJHANDLE ohv = _myOhv) const                              { return m_i._Put(var, string(val), ohv); }
+    bool Put(const string var, const string &val, const OBJHANDLE ohv = _myOhv) const                              { return m_i._Put(var, val, ohv); }
+    template<typename T> bool Put(const string var, const T& val, const OBJHANDLE ohv = _myOhv) const              { return m_i._Put(var, val, ohv); }
 
-    template<typename T> bool PutMMStruct(const char* var, const T val, const OBJHANDLE ohv = _myOhv) const;
-    template<typename T> bool GetMMStruct(const char* mod, const char* var, T* val, const unsigned int ver,
+    template<typename T> bool PutMMStruct(const string var, const T val, const OBJHANDLE ohv = _myOhv) const;
+    template<typename T> bool GetMMStruct(const string mod, const string var, T* val, const unsigned int ver,
                                           const unsigned int siz, const OBJHANDLE ohv = _myOhv) const;
 
-    template<typename T> bool PutMMBase(  const char* var, const T val, const OBJHANDLE ohv = _myOhv) const;
-    template<typename T> bool GetMMBase(  const char* mod, const char* var, T* val, const unsigned int ver,
+    template<typename T> bool PutMMBase(  const string var, const T val, const OBJHANDLE ohv = _myOhv) const;
+    template<typename T> bool GetMMBase(  const string mod, const string var, T* val, const unsigned int ver,
                                           const unsigned int siz, const OBJHANDLE ohv = _myOhv) const;
 
     bool GetLog(char *rFunc, string *rCli, string *rMod, string *rVar, string *rVes,
-                bool *rSucc, int *ix, const bool skipSelf = true)                                                    {return m_i._GetLog(rFunc, rCli, rMod, rVar, rVes, rSucc, ix, skipSelf);}
-    bool RstLog()                                                                                                    {return m_i._RstLog();}
-    bool GetVersion(string* ver) const { return m_i._GetVer(ver); }
+                bool *rSucc, int *ix, const bool skipSelf = true)                                                  { return m_i._GetLog(rFunc, rCli, rMod, rVar, rVes, rSucc, ix, skipSelf); }
+    bool RstLog()                                                                                                  { return m_i._RstLog(); }
+    bool GetVersion(string* ver) const                                                                             { return m_i._GetVer(ver); }
     bool Find(char *rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int *ix, 
-              const char* mod, const char* var, const OBJHANDLE ohv = NULL, const bool skipSelf = true)              {return m_i._Find(rTyp, rMod, rVar, rOhv, ix, mod, var, ohv, skipSelf);}
-    void UpdMod(const char* mod)                                                                                     {return m_i._UpdMod(mod);}
+              const string mod, const string var, const OBJHANDLE ohv = NULL, const bool skipSelf = true)          { return m_i._Find(rTyp, rMod, rVar, rOhv, ix, mod, var, ohv, skipSelf); }
+    void UpdMod(const string mod)                                                                                  { return m_i._UpdMod(mod); }
+    int  ObjType(const OBJHANDLE& val) const                                                                       { return m_i._ObjType(val); }
   private:
     Internal m_i;
   };
   
   // Inline implementation allows this to be included in multiple compilation units 
   // Compiler and linker will determine best way to combine the compilation units
-  template<typename T> inline bool Advanced::PutMMStruct(const char* var, const T val, const OBJHANDLE ohv) const {
+  template<typename T> inline bool Advanced::PutMMStruct(const string var, const T val, const OBJHANDLE ohv) const {
     const MMStruct *pSafeStruct = val;
     return m_i._Put(var, pSafeStruct, ohv);
   }
-  template<typename T> inline bool Advanced::GetMMStruct(const char* mod, const char* var, T* val, const unsigned int ver, const unsigned int siz, const OBJHANDLE ohv) const {
+
+  template<typename T> inline bool Advanced::GetMMStruct(const string mod, const string var, T* val, const unsigned int ver, const unsigned int siz, const OBJHANDLE ohv) const {
     const MMStruct *pMMStruct;
     if (!m_i._Get(mod, var, &pMMStruct, ohv)) return false;
     if (!pMMStruct->IsCorrectSize(siz) || !pMMStruct->IsCorrectVersion(ver)) return false;
@@ -78,12 +82,12 @@ namespace MMExt2
     return (val != NULL);
   }
 
-  template<typename T> inline bool Advanced::PutMMBase(const char* var, const T val, const OBJHANDLE ohv) const {
+  template<typename T> inline bool Advanced::PutMMBase(const string var, const T val, const OBJHANDLE ohv) const {
     const EnjoLib::ModuleMessagingExtBase *pSafeStruct = val;
     return m_i._Put(var, pSafeStruct, ohv);
   }
 
-  template<typename T> inline bool Advanced::GetMMBase(const char* mod, const char* var, T* val, const unsigned int ver, const unsigned int siz, const OBJHANDLE ohv) const {
+  template<typename T> inline bool Advanced::GetMMBase(const string mod, const string var, T* val, const unsigned int ver, const unsigned int siz, const OBJHANDLE ohv) const {
     const  EnjoLib::ModuleMessagingExtBase *pMMStruct;
     if (!m_i._Get(mod, var, &pMMStruct, ohv)) return false;
     if (!pMMStruct->IsCorrectSize(siz) || !pMMStruct->IsCorrectVersion(ver)) return false;

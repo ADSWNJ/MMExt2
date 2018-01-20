@@ -55,15 +55,19 @@ MMExt2_Core::MMExt2_Core() {}
 
 MMExt2_Core::~MMExt2_Core() {}
 
-inline bool _IsVessel(OBJHANDLE ohv) {
+inline int _ObjType(const OBJHANDLE& val) {
   int obj_type = OBJTP_INVALID;
   try {
-    obj_type = oapiGetObjectType(ohv); // if bad pointer, we can Access Violate on this call, so be very defensive around it. 
+    obj_type = oapiGetObjectType(val); // if bad pointer, we can Access Violate on this call, so be very defensive around it. 
   }
   catch (...) { // If you get C4571 compile error here, you must enable /EHa to catch structured exceptions- i.e. C++ Code Generation, Enable C++ Exceptions, Yes with SEH exceptions (/EHa).
     obj_type = OBJTP_INVALID;
   }
-  return (obj_type == OBJTP_VESSEL);
+  return obj_type;
+}
+
+inline bool _IsVessel(OBJHANDLE ohv) {
+  return (_ObjType(ohv) == OBJTP_VESSEL);
 }
 
 inline std::string _Id(const char* mod, const char* var, const OBJHANDLE ohv, const bool allowNullOhv = false) {
@@ -153,27 +157,14 @@ bool MMExt2_Core::Get(const string& cli, const string& id, OBJHANDLE* val){
 }
 
 bool MMExt2_Core::ValidateObjHandle(const string& cli, const string& id, const OBJHANDLE obj) {
-  int obj_type = OBJTP_INVALID;
-  try {
-    obj_type = oapiGetObjectType(obj); // if bad pointer, we can Access Violate on this call, so be very defensive around it. 
-  }
-  catch (...) { // see pragma 4571 at top of this code if you get compile error here
-    obj_type = OBJTP_INVALID;
-  }
-  if (obj_type != OBJTP_INVALID) return true; 
-  Delete("{core}", id, '\0'); // Expunge bad objects from the core
-  return false;
+  return (ObjType("", id, obj) != OBJTP_INVALID);
 }
 
-bool MMExt2_Core::ValidateObjIsVessel(const OBJHANDLE obj) {
-  int obj_type = OBJTP_INVALID;
-  try {
-    obj_type = oapiGetObjectType(obj); // if bad pointer, we can Access Violate on this call, so be very defensive around it. 
-  }
-  catch (...) { // If you get C4571 compile error here, you must enable /EHa to catch structured exceptions- i.e. C++ Code Generation, Enable C++ Exceptions, Yes with SEH exceptions (/EHa).
-    obj_type = OBJTP_INVALID;
-  }
-  return (obj_type == OBJTP_VESSEL);
+int MMExt2_Core::ObjType(const string& cli, const string& id, const OBJHANDLE& val) {
+  int obj_type = _ObjType(val);
+  if (obj_type == OBJTP_INVALID) Delete("{core}", id, '\0'); // Expunge bad objects from the core
+  if (cli!="") Log(cli, "T", (obj_type == OBJTP_INVALID), id);
+  return obj_type;
 }
 
 
@@ -214,7 +205,8 @@ bool MMExt2_Core::Log(const string& cli, const string& act, const bool& res, con
 
   istringstream is(s);
   getline(is, sohv, m_token);
-  sscanf(sohv.c_str(), "%p", &ohv);
+  int ret = sscanf(sohv.c_str(), "%p", &ohv);
+  if (ret != 1) return false;
   getline(is, mod, m_token);
   getline(is, var, m_token);
   if (!ohv) {
@@ -283,7 +275,8 @@ bool MMExt2_Core::Find(char* rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, 
     for (const auto& it : m_types) {
       istringstream is(it.first);
       getline(is, itsOhv, m_token);
-      sscanf(itsOhv.c_str(), "%p", &itOhv);
+      int ret = sscanf(itsOhv.c_str(), "%p", &itOhv);
+      if (ret != 1) return false;
       getline(is, itMod, m_token);
       getline(is, itVar, m_token);
       id = _Id((itMod).c_str(), (itVar).c_str(), itOhv);
@@ -343,6 +336,8 @@ DLLCLBK bool ModMsgGet_OBJHANDLE_v1(const char* cli, const char* mod, const char
 DLLCLBK bool ModMsgGet_MMStruct_v1( const char* cli, const char* mod, const char* var, const MMStruct** val, const OBJHANDLE ohv) { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
 DLLCLBK bool ModMsgGet_MMBase_v1(   const char* cli, const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase** val, const OBJHANDLE ohv)
                                                                                                                                   { return gCore.Get(string(cli), _Id(mod, var, ohv), val); }
+DLLCLBK int ModMsgObj_typ_v1(const OBJHANDLE& val)                                                                                { return _ObjType(val); }
+
 
 // Special handling for all string functions (do not want to expose the string implementation across compiler versions due to lack of ABI; therefore use char* as the interface)
 

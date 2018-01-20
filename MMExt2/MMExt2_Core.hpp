@@ -77,6 +77,8 @@ namespace MMExt2
     static bool Get(const string& cli, const string& id, const MMStruct** val);
     static bool Get(const string& cli, const string& id, const EnjoLib::ModuleMessagingExtBase** val);
 
+    static int ObjType(const string& cli, const string& id, const OBJHANDLE& val);
+
     static bool MMExt2_Core::Delete(const string& cli, const string& id, const char& c = '\0');
     static bool Find(char* rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int* ix, const string& cli, const string& mod, const string& var, const OBJHANDLE ohv, bool skp);
 
@@ -90,7 +92,6 @@ namespace MMExt2
     static bool DeleteType(const string &id, const char type);
 
     static bool ValidateObjHandle(const string& cli, const string& id, const OBJHANDLE obj);
-    static bool ValidateObjIsVessel(const OBJHANDLE obj);
 
 		template<class T> static bool SearchMap(const string& get, const string& id, const map<string, T>& mapToSearch, T* returnValue);
     template<class T> static bool SearchMapDelete(const string &id, map<string, T>& mapToSearch);

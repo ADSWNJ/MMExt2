@@ -23,65 +23,68 @@ using namespace std;
 namespace MMExt2
 {
   // Function prototypes for the DLL Interface
-  typedef bool(*FUNC_MMEXT2_PUT_INT) (                 const char* mod, const char* var, const int& val,           const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_BOO) (                 const char* mod, const char* var, const bool& val,          const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_DBL) (                 const char* mod, const char* var, const double& val,        const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_VEC) (                 const char* mod, const char* var, const VECTOR3& val,       const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_MX3) (                 const char* mod, const char* var, const MATRIX3& val,       const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_MX4) (                 const char* mod, const char* var, const MATRIX4& val,       const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_OBJ) (                 const char* mod, const char* var, const OBJHANDLE& val,     const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_CST) (                 const char* mod, const char* var, const char *val,          const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_DEL_ANY) (                 const char* mod, const char* var,                           const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_INT) (const char* cli, const char* mod, const char* var, int* val,                 const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_BOO) (const char* cli, const char* mod, const char* var, bool* val,                const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_DBL) (const char* cli, const char* mod, const char* var, double* val,              const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_VEC) (const char* cli, const char* mod, const char* var, VECTOR3* val,             const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_MX3) (const char* cli, const char* mod, const char* var, MATRIX3* val,             const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_MX4) (const char* cli, const char* mod, const char* var, MATRIX4* val,             const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_OBJ) (const char* cli, const char* mod, const char* var, OBJHANDLE* val,           const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_CST) (const char* cli, const char* mod, const char* var, char* val, size_t *len,   const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_VER) (const char* mod, char* var, size_t* len);
-  typedef bool(*FUNC_MMEXT2_GET_LOG) (char* rFunc, char *rCli, size_t *lCli, char *rMod, size_t *lMod, char *rVar, size_t *lVar, char *rVes, size_t *lVes, bool* rSucc, int* ix,
-                                      const char* cli, const bool skpSelf);
-  typedef bool(*FUNC_MMEXT2_FIND)    (char *rTyp, char *rMod, size_t *lMod, char *rVar, size_t *lVar, OBJHANDLE* rOhv, int* ix,
-                                      const char* cli, const char* mod, const char* var, const OBJHANDLE ohv, const bool skpSelf);
-  typedef bool(*FUNC_MMEXT2_PUT_MMB) (const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase* val, const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_PUT_MMS) (const char* mod, const char* var, const MMStruct* val, const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_MMB) (const char* cli, const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase** val, const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_GET_MMS) (const char* cli, const char* mod, const char* var, const MMStruct** val, const OBJHANDLE ohv);
-  typedef bool(*FUNC_MMEXT2_RST_LOG) ();
+  typedef bool (*FUNC_MMEXT2_PUT_INT) (                 const char* mod, const char* var, const int& val,           const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_BOO) (                 const char* mod, const char* var, const bool& val,          const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_DBL) (                 const char* mod, const char* var, const double& val,        const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_VEC) (                 const char* mod, const char* var, const VECTOR3& val,       const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_MX3) (                 const char* mod, const char* var, const MATRIX3& val,       const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_MX4) (                 const char* mod, const char* var, const MATRIX4& val,       const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_OBJ) (                 const char* mod, const char* var, const OBJHANDLE& val,     const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_CST) (                 const char* mod, const char* var, const char *val,          const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_DEL_ANY) (                 const char* mod, const char* var,                           const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_INT) (const char* cli, const char* mod, const char* var, int* val,                 const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_BOO) (const char* cli, const char* mod, const char* var, bool* val,                const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_DBL) (const char* cli, const char* mod, const char* var, double* val,              const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_VEC) (const char* cli, const char* mod, const char* var, VECTOR3* val,             const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_MX3) (const char* cli, const char* mod, const char* var, MATRIX3* val,             const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_MX4) (const char* cli, const char* mod, const char* var, MATRIX4* val,             const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_OBJ) (const char* cli, const char* mod, const char* var, OBJHANDLE* val,           const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_CST) (const char* cli, const char* mod, const char* var, char* val, size_t *len,   const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_VER) (const char* mod, char* var, size_t* len);
+  typedef bool (*FUNC_MMEXT2_GET_LOG) (char* rFunc, char *rCli, size_t *lCli, char *rMod, size_t *lMod, char *rVar, size_t *lVar, char *rVes, size_t *lVes, bool* rSucc, int* ix,
+                                       const char* cli, const bool skpSelf);
+  typedef bool (*FUNC_MMEXT2_FIND)    (char *rTyp, char *rMod, size_t *lMod, char *rVar, size_t *lVar, OBJHANDLE* rOhv, int* ix,
+                                       const char* cli, const char* mod, const char* var, const OBJHANDLE ohv, const bool skpSelf);
+  typedef bool (*FUNC_MMEXT2_PUT_MMB) (const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase* val, const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_PUT_MMS) (const char* mod, const char* var, const MMStruct* val, const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_MMB) (const char* cli, const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase** val, const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_GET_MMS) (const char* cli, const char* mod, const char* var, const MMStruct** val, const OBJHANDLE ohv);
+  typedef bool (*FUNC_MMEXT2_RST_LOG) ();
+  typedef int  (*FUNC_MMEXT2_OBJ_TYP) (const OBJHANDLE& val);
 
   class Internal {
   public:
-    Internal(const char *mod);
+    Internal(const string& mod);
     ~Internal();
     bool IsInit() const {return m_initialized;};
-    bool _Put( const char* var, const int &val,                          const OBJHANDLE ohv = NULL) const   { return ((m_fPI) && ((*m_fPI)(m_mod, var, val,         _GetOhv(ohv)))); }
-    bool _Put( const char* var, const bool &val,                         const OBJHANDLE ohv = NULL) const   { return ((m_fPB) && ((*m_fPB)(m_mod, var, val,         _GetOhv(ohv)))); }
-    bool _Put( const char* var, const double &val,                       const OBJHANDLE ohv = NULL) const   { return ((m_fPD) && ((*m_fPD)(m_mod, var, val,         _GetOhv(ohv)))); }
-    bool _Put( const char* var, const VECTOR3 &val,                      const OBJHANDLE ohv = NULL) const   { return ((m_fPV) && ((*m_fPV)(m_mod, var, val,         _GetOhv(ohv)))); }
-    bool _Put( const char* var, const MATRIX3 &val,                      const OBJHANDLE ohv = NULL) const   { return ((m_fP3) && ((*m_fP3)(m_mod, var, val,         _GetOhv(ohv)))); }
-    bool _Put( const char* var, const MATRIX4 &val,                      const OBJHANDLE ohv = NULL) const   { return ((m_fP4) && ((*m_fP4)(m_mod, var, val,         _GetOhv(ohv)))); }
-    bool _Put( const char* var, const OBJHANDLE &val,                    const OBJHANDLE ohv = NULL) const   { return ((m_fPO) && ((*m_fPO)(m_mod, var, val,         _GetOhv(ohv)))); }
-    bool _Put( const char* var, const string &val,                       const OBJHANDLE ohv = NULL) const   { return ((m_fPS) && ((*m_fPS)(m_mod, var, val.c_str(), _GetOhv(ohv)))); }
-    bool _Del( const char* var,                                          const OBJHANDLE ohv = NULL) const   { return ((m_fDA) && ((*m_fDA)(m_mod, var,              _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, int* val,               const OBJHANDLE ohv = NULL) const   { return ((m_fGI) && ((*m_fGI)(m_mod, mod, var, val,    _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, bool* val,              const OBJHANDLE ohv = NULL) const   { return ((m_fGB) && ((*m_fGB)(m_mod, mod, var, val,    _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, double* val,            const OBJHANDLE ohv = NULL) const   { return ((m_fGD) && ((*m_fGD)(m_mod, mod, var, val,    _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, VECTOR3* val,           const OBJHANDLE ohv = NULL) const   { return ((m_fGV) && ((*m_fGV)(m_mod, mod, var, val,    _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, MATRIX3* val,           const OBJHANDLE ohv = NULL) const   { return ((m_fG3) && ((*m_fG3)(m_mod, mod, var, val,    _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, MATRIX4* val,           const OBJHANDLE ohv = NULL) const   { return ((m_fG4) && ((*m_fG4)(m_mod, mod, var, val,    _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, OBJHANDLE* val,         const OBJHANDLE ohv = NULL) const   { return ((m_fGO) && ((*m_fGO)(m_mod, mod, var, val,    _GetOhv(ohv)))); }
-    bool _Get( const char* mod, const char* var, string* val,            const OBJHANDLE ohv = NULL) const;
+    bool _Put( const string& var, const int& val,                   const OBJHANDLE ohv = NULL) const   { return ((m_fPI) && ((*m_fPI)(m_mod,          _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Put( const string& var, const bool& val,                  const OBJHANDLE ohv = NULL) const   { return ((m_fPB) && ((*m_fPB)(m_mod,          _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Put( const string& var, const double& val,                const OBJHANDLE ohv = NULL) const   { return ((m_fPD) && ((*m_fPD)(m_mod,          _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Put( const string& var, const VECTOR3& val,               const OBJHANDLE ohv = NULL) const   { return ((m_fPV) && ((*m_fPV)(m_mod,          _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Put( const string& var, const MATRIX3& val,               const OBJHANDLE ohv = NULL) const   { return ((m_fP3) && ((*m_fP3)(m_mod,          _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Put( const string& var, const MATRIX4& val,               const OBJHANDLE ohv = NULL) const   { return ((m_fP4) && ((*m_fP4)(m_mod,          _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Put( const string& var, const OBJHANDLE& val,             const OBJHANDLE ohv = NULL) const   { return ((m_fPO) && ((*m_fPO)(m_mod,          _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Put( const string& var, const string& val,                const OBJHANDLE ohv = NULL) const   { return ((m_fPS) && ((*m_fPS)(m_mod,          _s(var), _s(val), _GetOhv(ohv)))); }
+    bool _Del( const string& var,                                   const OBJHANDLE ohv = NULL) const   { return ((m_fDA) && ((*m_fDA)(m_mod,          _s(var),          _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, int* val,       const OBJHANDLE ohv = NULL) const   { return ((m_fGI) && ((*m_fGI)(m_mod, _s(mod), _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, bool* val,      const OBJHANDLE ohv = NULL) const   { return ((m_fGB) && ((*m_fGB)(m_mod, _s(mod), _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, double* val,    const OBJHANDLE ohv = NULL) const   { return ((m_fGD) && ((*m_fGD)(m_mod, _s(mod), _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, VECTOR3* val,   const OBJHANDLE ohv = NULL) const   { return ((m_fGV) && ((*m_fGV)(m_mod, _s(mod), _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, MATRIX3* val,   const OBJHANDLE ohv = NULL) const   { return ((m_fG3) && ((*m_fG3)(m_mod, _s(mod), _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, MATRIX4* val,   const OBJHANDLE ohv = NULL) const   { return ((m_fG4) && ((*m_fG4)(m_mod, _s(mod), _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, OBJHANDLE* val, const OBJHANDLE ohv = NULL) const   { return ((m_fGO) && ((*m_fGO)(m_mod, _s(mod), _s(var),    val,  _GetOhv(ohv)))); }
+    bool _Get( const string& mod, const string& var, string* val,    const OBJHANDLE ohv = NULL) const;
     bool _GetVer(string* ver) const;
     bool _GetLog(char *rfunc, string *rcli, string *rmod, string *rvar, string *rves, bool *rsucc, int *ix, const bool skipSelf);
     bool _RstLog() { return ((m_fRL) && (*m_fRL)()); }
-    bool _Find(char *rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int *ix, const char* mod, const char* var, const OBJHANDLE ohv, const bool skipSelf);
-    void _UpdMod(const char *mod);
-    bool _Put(const char* var, const EnjoLib::ModuleMessagingExtBase* val, const OBJHANDLE ohv = NULL) const { return ((m_fPY) && ((*m_fPY)(m_mod, var, val, _GetOhv(ohv)))); }
-    bool _Put(const char* var, const MMStruct* val, const OBJHANDLE ohv = NULL) const { return ((m_fPX) && ((*m_fPX)(m_mod, var, val, _GetOhv(ohv)))); }
-    bool _Get(const char* mod, const char* var, const EnjoLib::ModuleMessagingExtBase** val, const OBJHANDLE ohv = NULL) const { return ((m_fGY) && ((*m_fGY)(m_mod, mod, var, val, _GetOhv(ohv)))); }
-    bool _Get(const char* mod, const char* var, const MMStruct** val, const OBJHANDLE ohv = NULL) const { return ((m_fGX) && ((*m_fGX)(m_mod, mod, var, val, _GetOhv(ohv)))); }
+    bool _Find(char *rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int *ix, const string& mod, const string& var, const OBJHANDLE ohv, const bool skipSelf);
+    void _UpdMod(const string& mod);
+    bool _Put(const string& var, const EnjoLib::ModuleMessagingExtBase* val, const OBJHANDLE ohv = NULL) const { return ((m_fPY) && ((*m_fPY)(m_mod, _s(var), val, _GetOhv(ohv)))); }
+    bool _Put(const string& var, const MMStruct* val, const OBJHANDLE ohv = NULL) const { return ((m_fPX) && ((*m_fPX)(m_mod, _s(var), val, _GetOhv(ohv)))); }
+    bool _Get(const string& mod, const string& var, const EnjoLib::ModuleMessagingExtBase** val, const OBJHANDLE ohv = NULL) const { return ((m_fGY) && ((*m_fGY)(m_mod, _s(mod), _s(var), val, _GetOhv(ohv)))); }
+    bool _Get(const string& mod, const string& var, const MMStruct** val, const OBJHANDLE ohv = NULL) const { return ((m_fGX) && ((*m_fGX)(m_mod, _s(mod), _s(var), val, _GetOhv(ohv)))); }
+    int _ObjType(const OBJHANDLE& val) const;
+    const char* _s(const string& s) const { return s.c_str(); }
   private:
     FUNC_MMEXT2_PUT_INT m_fPI;
     FUNC_MMEXT2_PUT_BOO m_fPB;
@@ -108,6 +111,7 @@ namespace MMExt2
     FUNC_MMEXT2_GET_MMB m_fGY;
     FUNC_MMEXT2_GET_MMS m_fGX;
     FUNC_MMEXT2_RST_LOG m_fRL;
+    FUNC_MMEXT2_OBJ_TYP m_fOT;
     bool m_initialized;
     HMODULE m_hDLL;
     char* m_mod;
@@ -116,27 +120,27 @@ namespace MMExt2
   // End of class definition
 
   // Inline implementation definition
-  inline bool Internal::_Get(const char* mod, const char* var, std::string* val, const OBJHANDLE ohv) const {
+  inline bool Internal::_Get(const string& mod, const string& var, string* val, const OBJHANDLE ohv) const {
     *val = "";
     if (!m_fGS) return false;
     const size_t mxln = 64;
     size_t csl = mxln;
     char buf[mxln];
-    if (!(*m_fGS)(m_mod, mod, var, buf, &csl, _GetOhv(ohv))) return false;
+    if (!(*m_fGS)(m_mod, _s(mod), _s(var), buf, &csl, _GetOhv(ohv))) return false;
     if (csl <= mxln) {
       *val = buf;
       return true;
     }
     // long string support
     char *p1 = static_cast<char *>(malloc(csl));
-    if (!(*m_fGS)(m_mod, mod, var, p1, &csl, _GetOhv(ohv))) return false;
+    if (!(*m_fGS)(m_mod, _s(mod), _s(var), p1, &csl, _GetOhv(ohv))) return false;
     *val = p1;
     free(p1);
     return true;
   };
 
 
-  inline bool Internal::_GetVer(std::string* ver) const {
+  inline bool Internal::_GetVer(string* ver) const {
     *ver = "";
     if (!m_fVR) return false;
     const size_t mxln = 64;
@@ -155,7 +159,7 @@ namespace MMExt2
     return true;
   };
 
-  inline bool Internal::_Find(char *rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int *ix, const char* mod, const char* var, const OBJHANDLE ohv, const bool skipSelf) {
+  inline bool Internal::_Find(char *rTyp, string* rMod, string* rVar, OBJHANDLE* rOhv, int *ix, const string& mod, const string& var, const OBJHANDLE ohv, const bool skipSelf) {
     *rMod = "";
     *rVar = "";
     *rOhv = NULL;
@@ -170,12 +174,12 @@ namespace MMExt2
     pmod = bmod;
     pvar = bvar;
 
-    if (!(*m_fFA)(rTyp, pmod, &lmod, pvar, &lvar, rOhv, ix,  m_mod, mod, var, ohv, skipSelf)) return false;
+    if (!(*m_fFA)(rTyp, pmod, &lmod, pvar, &lvar, rOhv, ix,  m_mod, _s(mod), _s(var), ohv, skipSelf)) return false;
     if (lmod > mxln || lvar > mxln) {
       needBig = true;
       pmod = static_cast<char *>(malloc(lmod));
       pvar = static_cast<char *>(malloc(lvar));
-      if (!(*m_fFA)(rTyp, pmod, &lmod, pvar, &lvar, rOhv, ix, m_mod, mod, var, ohv, skipSelf)) {
+      if (!(*m_fFA)(rTyp, pmod, &lmod, pvar, &lvar, rOhv, ix, m_mod, _s(mod), _s(var), ohv, skipSelf)) {
         free(pmod);
         free(pvar);
         return false;
@@ -226,17 +230,22 @@ namespace MMExt2
       return oapiGetFocusInterface()->GetHandle();
   }
 
-  inline void Internal::_UpdMod(const char *mod) {
+  inline void Internal::_UpdMod(const string& mod) {
       if (m_mod) {
-          if (!strcmp(m_mod, mod)) return;
+          if (!strcmp(m_mod, mod.c_str())) return;
           free(m_mod);
       }
-      m_mod = _strdup(mod);
+      m_mod = _strdup(mod.c_str());
   }
 
-  inline Internal::Internal(const char *mod) {
+  inline int Internal::_ObjType(const OBJHANDLE& val) const {
+    if (!m_fOT) return -1;
+    return ((*m_fOT)(val));
+  }
+
+  inline Internal::Internal(const string& mod) {
     if (m_initialized) return;
-    m_mod = _strdup(mod);
+    m_mod = _strdup(mod.c_str());
     if (!(m_hDLL = LoadLibraryA(".\\Modules\\MMExt2.dll"))) return;
     m_fPI = (FUNC_MMEXT2_PUT_INT)GetProcAddress(m_hDLL, "ModMsgPut_int_v1");
     m_fPB = (FUNC_MMEXT2_PUT_BOO)GetProcAddress(m_hDLL, "ModMsgPut_bool_v1");
@@ -263,6 +272,7 @@ namespace MMExt2
     m_fGY = (FUNC_MMEXT2_GET_MMB)GetProcAddress(m_hDLL, "ModMsgGet_MMBase_v1");
     m_fGX = (FUNC_MMEXT2_GET_MMS)GetProcAddress(m_hDLL, "ModMsgGet_MMStruct_v1");
     m_fRL = (FUNC_MMEXT2_RST_LOG)GetProcAddress(m_hDLL, "ModMsgRst_log_v1");
+    m_fOT = (FUNC_MMEXT2_OBJ_TYP)GetProcAddress(m_hDLL, "ModMsgObj_typ_v1");
     m_initialized = true;
   };
 
