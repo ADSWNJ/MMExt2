@@ -83,6 +83,8 @@ namespace MMExt2
     return (val != NULL);
   }
 
+  // Deprecated support for MMBase
+  /*
   template<typename T> inline bool Advanced::PutMMBase(const string var, const T val, const OBJHANDLE ohv) const {
     const EnjoLib::ModuleMessagingExtBase *pSafeStruct = val;
     return m_i._Put(var, pSafeStruct, ohv);
@@ -95,5 +97,6 @@ namespace MMExt2
     *val = dynamic_cast<T>(pMMStruct);
     return (val != NULL);
   }
+  */
 }
 #endif // MMExt2_Advanced_H
