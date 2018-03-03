@@ -1,5 +1,5 @@
 // =======================================================================
-//         ORBITER AUX LIBRARY: Module Messaging Extended v2
+//         ORBITER AUX LIBRARY: Module Messaging Extended v2a
 //                              Basic Interface
 //
 // MMExt v2 allows Orbiter modules to communicate with each other,

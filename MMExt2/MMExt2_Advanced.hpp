@@ -1,5 +1,5 @@
 // =======================================================================
-//         ORBITER AUX LIBRARY: Module Messaging Extended v2
+//         ORBITER AUX LIBRARY: Module Messaging Extended v2a
 //                              Advanced Interface
 //
 // MMExt v2 allows Orbiter modules to communicate with each other,
@@ -51,9 +51,10 @@ namespace MMExt2
     template<typename T> bool GetMMStruct(const string mod, const string var, T* val, const unsigned int ver,
                                           const unsigned int siz, const OBJHANDLE ohv = _myOhv) const;
 
-    template<typename T> bool PutMMBase(  const string var, const T val, const OBJHANDLE ohv = _myOhv) const;
-    template<typename T> bool GetMMBase(  const string mod, const string var, T* val, const unsigned int ver,
-                                          const unsigned int siz, const OBJHANDLE ohv = _myOhv) const;
+    //Remove support for old EnjoLib::ModuleMessagingExtBase. Please use MMStruct from now on. 
+    //template<typename T> bool PutMMBase(  const string var, const T val, const OBJHANDLE ohv = _myOhv) const;
+    //template<typename T> bool GetMMBase(  const string mod, const string var, T* val, const unsigned int ver,
+    //                                      const unsigned int siz, const OBJHANDLE ohv = _myOhv) const;
 
     bool GetLog(char *rFunc, string *rCli, string *rMod, string *rVar, string *rVes,
                 bool *rSucc, int *ix, const bool skipSelf = true)                                                  { return m_i._GetLog(rFunc, rCli, rMod, rVar, rVes, rSucc, ix, skipSelf); }

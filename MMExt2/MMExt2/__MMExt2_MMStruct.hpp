@@ -1,5 +1,5 @@
 // =======================================================================
-//         ORBITER AUX LIBRARY: Module Messaging Extended v2
+//         ORBITER AUX LIBRARY: Module Messaging Extended v2a
 //                              MMStruct interchange struct header
 //
 // Copyright  (C) 2014-2018 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes

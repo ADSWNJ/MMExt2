@@ -41,6 +41,9 @@
     <ClInclude Include="MMExt2\__MMExt2_MMStruct.hpp">
       <Filter>Header Files\MMExt2</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CopyHPPtoOrbiter.bat">
@@ -57,5 +60,10 @@
     <Text Include="lgpl.txt">
       <Filter>Misc</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MMExt2.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

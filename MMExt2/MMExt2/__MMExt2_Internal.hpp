@@ -1,5 +1,5 @@
 // ================================================================================
-//         ORBITER AUX LIBRARY: Module Messaging Extended v2
+//         ORBITER AUX LIBRARY: Module Messaging Extended v2a
 //                              DLL Interface Internal Header
 //
 // Copyright  (C) 2014-2018 Szymon "Enjo" Ender and Andrew "ADSWNJ" Stokes
@@ -243,7 +243,14 @@ namespace MMExt2
     return ((*m_fOT)(val));
   }
 
-  inline Internal::Internal(const string& mod) {
+  inline Internal::Internal(const string& mod) :
+    m_initialized(false),
+    m_hDLL(NULL), m_fPI(NULL), m_fPB(NULL), m_fPD(NULL), m_fPV(NULL),
+    m_fP3(NULL),  m_fP4(NULL), m_fPO(NULL), m_fPS(NULL), m_fGI(NULL),
+    m_fGB(NULL),  m_fGD(NULL), m_fGV(NULL), m_fG3(NULL), m_fG4(NULL),
+    m_fGO(NULL),  m_fGS(NULL), m_fDA(NULL), m_fVR(NULL), m_fGL(NULL),
+    m_fFA(NULL),  m_fPY(NULL), m_fPX(NULL), m_fGY(NULL), m_fGX(NULL),
+    m_fRL(NULL),  m_fOT(NULL)    {
     if (m_initialized) return;
     m_mod = _strdup(mod.c_str());
     if (!(m_hDLL = LoadLibraryA(".\\Modules\\MMExt2.dll"))) return;
@@ -267,9 +274,9 @@ namespace MMExt2
     m_fVR = (FUNC_MMEXT2_GET_VER)GetProcAddress(m_hDLL, "ModMsgGet_ver_v1");
     m_fGL = (FUNC_MMEXT2_GET_LOG)GetProcAddress(m_hDLL, "ModMsgGet_log_v1");
     m_fFA = (FUNC_MMEXT2_FIND)   GetProcAddress(m_hDLL, "ModMsgFind_v1");
-    m_fPY = (FUNC_MMEXT2_PUT_MMB)GetProcAddress(m_hDLL, "ModMsgPut_MMBase_v1");
+    //m_fPY = (FUNC_MMEXT2_PUT_MMB)GetProcAddress(m_hDLL, "ModMsgPut_MMBase_v1");
     m_fPX = (FUNC_MMEXT2_PUT_MMS)GetProcAddress(m_hDLL, "ModMsgPut_MMStruct_v1");
-    m_fGY = (FUNC_MMEXT2_GET_MMB)GetProcAddress(m_hDLL, "ModMsgGet_MMBase_v1");
+    //m_fGY = (FUNC_MMEXT2_GET_MMB)GetProcAddress(m_hDLL, "ModMsgGet_MMBase_v1");
     m_fGX = (FUNC_MMEXT2_GET_MMS)GetProcAddress(m_hDLL, "ModMsgGet_MMStruct_v1");
     m_fRL = (FUNC_MMEXT2_RST_LOG)GetProcAddress(m_hDLL, "ModMsgRst_log_v1");
     m_fOT = (FUNC_MMEXT2_OBJ_TYP)GetProcAddress(m_hDLL, "ModMsgObj_typ_v1");
