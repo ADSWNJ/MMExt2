@@ -33,7 +33,7 @@
 using namespace MMExt2;
 using namespace std;
 
-#define MMEXT2_VERSION_NUMBER "v2.0"
+#define MMEXT2_VERSION_NUMBER "v2.0a"
 #define TOKEN_VALUE 186
 
 MMExt2_Core gCore;
@@ -67,7 +67,7 @@ inline int _ObjType(const OBJHANDLE& val) {
 }
 
 inline bool _IsVessel(OBJHANDLE ohv) {
-  return (_ObjType(ohv) == OBJTP_VESSEL);
+  return (_ObjType(ohv) == OBJTP_VESSEL); // Looking for 10. If 0, then objtype is INVALID. Check if they are sending an OBJHANDLE or a VESSEL* ... we want an OBJHANDLE. 
 }
 
 inline std::string _Id(const char* mod, const char* var, const OBJHANDLE ohv, const bool allowNullOhv = false) {
