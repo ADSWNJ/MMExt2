@@ -133,7 +133,6 @@ namespace MMExt2
     }
     // long string support
     char *p1 = static_cast<char *>(malloc(csl));
-    if (p1 == NULL) return false;
     if (!(*m_fGS)(m_mod, _s(mod), _s(var), p1, &csl, _GetOhv(ohv))) return false;
     *val = p1;
     free(p1);
@@ -154,7 +153,6 @@ namespace MMExt2
     }
     // long string support
     char *p1 = static_cast<char *>(malloc(csl));
-    if (p1 == NULL) return false;
     if (!(*m_fVR)(m_mod, p1, &csl)) return false;
     *ver = p1;
     free(p1);
@@ -180,9 +178,7 @@ namespace MMExt2
     if (lmod > mxln || lvar > mxln) {
       needBig = true;
       pmod = static_cast<char *>(malloc(lmod));
-      if (pmod == NULL) return false;
       pvar = static_cast<char *>(malloc(lvar));
-      if (pvar == NULL) { free(pmod);  return false; }
       if (!(*m_fFA)(rTyp, pmod, &lmod, pvar, &lvar, rOhv, ix, m_mod, _s(mod), _s(var), ohv, skipSelf)) {
         free(pmod);
         free(pvar);
@@ -211,13 +207,9 @@ namespace MMExt2
     if (lcli > mxln || lmod > mxln || lvar > mxln || lves > mxln) {
         needBig = true;
         pcli = static_cast<char *>(malloc(lcli));
-        if (pcli == NULL) return false;
         pmod = static_cast<char *>(malloc(lmod));
-        if (pmod == NULL) { free(pcli);  return false; }
         pvar = static_cast<char *>(malloc(lvar));
-        if (pvar == NULL) { free(pmod);  free(pcli);  return false; }
         pves = static_cast<char *>(malloc(lves));
-        if (pves == NULL) { free(pvar);  free(pmod);  free(pcli);  return false; }
         if (!(*m_fGL)(rfunc, pcli, &lcli, pmod, &lmod, pvar, &lvar, pves, &lves, rsucc, ix, m_mod, skipSelf)) {
             free(pcli); free(pmod); free(pvar); free(pves);
             return false;
