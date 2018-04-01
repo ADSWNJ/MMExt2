@@ -33,7 +33,7 @@
 using namespace MMExt2;
 using namespace std;
 
-#define MMEXT2_VERSION_NUMBER "v2.0a"
+#define MMEXT2_VERSION_NUMBER "v2.1"
 #define TOKEN_VALUE 186
 
 MMExt2_Core gCore;
